@@ -83,3 +83,8 @@ Database Design <br>
 Data Warehouse Design <br>
 Web Scraping <br>
 Programming (SQL and Python) <br>
+
+### 1.5. End to End Process Flowchart
+![image](https://user-images.githubusercontent.com/99619460/184965051-de786019-b4db-47d3-9a4a-29891e86895a.png)
+
+

@@ -471,11 +471,21 @@ The below visual shows only nine tables are part of the data model, and others a
 
 ### 4.6. Power BI Report
 
+Below visuals show different reports created in Power BI.
+
 ![image](https://user-images.githubusercontent.com/99619460/184984804-933162ea-3287-42d8-9868-880080a3e765.png)
 
 ![image](https://user-images.githubusercontent.com/99619460/184984851-9a763e68-12c6-475d-ba41-057a39265dc9.png)
 
+### 4.7. Power BI Dashboard
 
+Below visuals show different dashboards created in Power BI.
+
+![image](https://user-images.githubusercontent.com/99619460/184985050-6b34b42c-799c-4d7b-b19b-dbf2c15aa6c0.png)
+
+![image](https://user-images.githubusercontent.com/99619460/184985074-77c0f1eb-fa7b-430f-b1b4-86bfc3b24634.png)
+
+![image](https://user-images.githubusercontent.com/99619460/184985127-b970f567-c42e-4e69-9ef5-8dc24cca539f.png)
 
 
 

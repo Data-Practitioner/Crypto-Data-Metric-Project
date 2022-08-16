@@ -1,0 +1,195 @@
+# Importing libraries.
+import pandas as pd
+import sqlalchemy as sql
+import re
+import nltk
+import unicodedata
+import contractions
+import psycopg2 as ps
+import psycopg2.extras as extras
+from nltk.tokenize.toktok import ToktokTokenizer
+from textblob import Word
+from textblob import TextBlob
+
+# Connect to Postgres DB.
+engine = sql.create_engine("postgresql://postgres:---@localhost/CryptoSocial")
+conn = engine.connect()
+print('Conneted!')
+
+column_names = ['tweet', 'tweet_time']
+
+# Getting data from the database.
+sql_query = """
+SELECT tweet, time
+FROM staging_db.twitter_real_time_user_staging_db
+WHERE extraction_timestamp >= NOW() - INTERVAL '24 HOURS'
+ORDER BY twitter_real_time_user_id DESC
+"""
+
+# Executing SQL code to get the data and storing in dataframe.
+df = pd.DataFrame(engine.execute(sql_query),
+                  columns=column_names)
+
+# Close the connection to Postgres DB.
+conn.close()
+print('Disconneted!')
+
+# Drop duplicates.
+df.drop_duplicates()
+
+# Word count.
+df['word_count'] = df['tweet'].apply(lambda x: len(str(x).split()))
+
+# Character count.
+df['character_count'] = df['tweet'].apply(lambda x: len(str(x).split()))
+
+# Average word length.
+df['avg_word_length'] =  df['character_count']/df['word_count']
+
+# Remove HTML tags.
+clean_html = re.compile('<.*?>|&([a-z0-9]+|#[0-9]{1,6}|#x[0-9a-f]{1,6});')
+
+def cleanhtml(raw_html):
+  cleantext = re.sub(clean_html, '', raw_html)
+  return cleantext
+
+df['clean_tweet'] = df['tweet'].apply(lambda x: cleanhtml(x))
+
+# Remove accented characters.
+def remove_accented_chars(text):
+    text = unicodedata.normalize('NFKD', text).encode('ascii', 'ignore').decode('utf-8', 'ignore')
+    return text
+
+df['clean_tweet'] = df['clean_tweet'].apply(lambda x: remove_accented_chars(x))
+
+# Remove contractions.
+df['clean_tweet'] = df['clean_tweet'].apply(lambda x: contractions.fix(x))
+
+# Remove whitespaces.
+def remove_redundant_whitespaces(text):
+    text = re.sub(r'\s+'," ", text)
+    return text.strip()
+
+df['clean_tweet'] = df['clean_tweet'].apply(lambda x: remove_redundant_whitespaces(x))
+
+# Remove stopwords.
+tokenizer = ToktokTokenizer()
+stopword_list = nltk.corpus.stopwords.words('english')
+
+def remove_stopwords(text, is_lower_case=False, stopwords=stopword_list):
+    tokens = tokenizer.tokenize(text)
+    tokens = [token.strip() for token in tokens]
+    if is_lower_case:
+        filtered_tokens = [token for token in tokens if token not in stopwords]
+    else:
+        filtered_tokens = [token for token in tokens if token.lower() not in stopwords]
+    filtered_text = ' '.join(filtered_tokens)
+    return filtered_text
+
+df['clean_tweet'] = df['clean_tweet'].apply(lambda x: remove_stopwords(x))
+
+# Lower case conversion.
+df['clean_tweet'] = df['clean_tweet'].apply(lambda x: x.lower())
+
+# Correcting spellings.
+df['clean_tweet'] = df['clean_tweet'].apply(lambda x:  Word(x))
+
+### Removing Special Characters, RT, and links ###
+def remove_special_characters(text, remove_digits=False):
+    pattern = r'[^a-zA-Z0-9\s]' if not remove_digits else r'[^a-zA-Z\s]'
+    text = re.sub(pattern, '', text)
+    text = re.sub(r'\brt\b', '', text)
+    text = re.sub(r'http\S+','', text)
+    return text
+
+df['clean_tweet'] = df['clean_tweet'].apply(lambda x: remove_special_characters(x))
+
+# Building sentimental analyzer.
+pol = lambda x: TextBlob(x).sentiment.polarity
+sub = lambda x: TextBlob(x).sentiment.subjectivity
+
+# Polarity means positive or negative statement. Subjectivity of 1 refers to how opinionated a statement and 0 is based on fact.
+df['polarity'] = round(df['clean_tweet'].apply(pol), 2)
+df['subjectivity'] = round(df['clean_tweet'].apply(sub), 2)
+
+# Categorizing sentiment value.
+def sentiment(x):
+    if x > 0.5:
+        return "very positive"
+    elif 0 < x <= 0.5:
+        return "positive"
+    elif x == 0:
+        return "neutral"
+    elif -0.5 <= x < 0:
+        return "negative"
+    elif -0.5 > x:
+        return "very negative"
+
+df['sentiment_category'] = df['polarity'].apply(lambda x: sentiment(x))
+
+# Categorizing by label.
+df['clean_tweet'] = df['clean_tweet'].apply(lambda x: x.split())
+
+labels = ['eth', 'ethereum', 'bitcoin', 'btc']
+
+def category(x):
+    if 'btc' in x:
+        return 'btc'
+    elif 'eth' in x:
+        return 'eth'
+    elif 'bitcoin' in x:
+        return 'bitcoin'
+    elif 'ethereum'in x:
+        return 'ethereum'
+    else:
+        return 'none'
+
+df['category'] = df['clean_tweet'].apply(lambda x: category(x))
+df['category'] = df['category'].replace(['btc', 'eth'], ['bitcoin','ethereum'], regex=True)
+
+# Filter all rows where category is none.
+df = df[df['category'] != 'none']
+
+# Inserting column for transformation timestamp.
+df.insert(10, 'transformation_timestamp', pd.to_datetime('now').replace(microsecond=0))
+
+# Reorganizing columns.
+df = df[['tweet', 'clean_tweet', 'word_count','character_count','avg_word_length',
+         'polarity','subjectivity','sentiment_category', 'category', 'tweet_time', 'transformation_timestamp']]
+
+# Connecting to Postgres DB.
+conn = ps.connect(host="----",
+                  dbname="CryptoSocial",
+                  port=----,
+                  user="----",
+                  password="----")
+
+print('Conneted!')
+
+# Defining sql function.
+def execute_values(conn, df, table):
+    # Create a list of tupples from the dataframe values
+    tuples = [tuple(x) for x in df.to_numpy()]
+    # Comma-separated dataframe columns
+    cols = ','.join(list(df.columns))
+    # SQL quert to execute
+    query  = "INSERT INTO %s(%s) VALUES %%s" % (table, cols)
+    cursor = conn.cursor()
+    try:
+        extras.execute_values(cursor, query, tuples)
+        conn.commit()
+    except (Exception, ps.DatabaseError) as error:
+        print("Error: %s" % error)
+        conn.rollback()
+        cursor.close()
+        return 1
+    print("execute_values() done")
+    cursor.close()
+
+# Executing sql code.
+execute_values(conn, df, "ml_db.twitter_real_time_user_ml_db")
+print("Data is inserted in ml_db.twitter_real_time_user_ml_db table.")
+
+# Closing the connection with Postgres.
+conn.close()
+print('Disconneted!')

@@ -1,0 +1,90 @@
+# Importing libraries.
+import tweepy
+import pandas as pd
+import sqlalchemy as sql
+
+# Authenticating twitter credentials.
+api_key = '----'
+api_key_secret = '----'
+access_token = '----'
+access_token_secret = '----'
+
+auth = tweepy.OAuthHandler(api_key, api_key_secret)
+auth.set_access_token(access_token, access_token_secret)
+api = tweepy.API(auth, wait_on_rate_limit = True)
+
+# Read tweets in real time.
+class Linstener(tweepy.Stream):
+
+    # Save the tweets into a dataframe.
+    tweets = []
+
+    # When new tweet is received on_status class is activated.
+    def on_status(self, status):
+        self.tweets.append(status)
+        # print(status.user.screen_name + ": " + status.text)
+
+        # Stop receiving tweets when it reaches limit.
+        if len(self.tweets) == self.limit:
+            self.disconnect()
+
+stream_tweet = Linstener(api_key, api_key_secret, access_token, access_token_secret)
+
+# Stream by keywords - This will search for keywords and match the tweet.
+# keywords = ['crypto', '#crypto', 'btc', '#btc' 'eth', '#eth']
+
+# stream_tweet.filter(track=keywords)
+
+# Stream by users.
+users = ['CoinDesk', 'BloombergCrypto', 'Bitcoin',  'Coin_Tracking', 'Cointelegraph',
+        'cryptocom', 'crypto', 'CoinMarketCap', 'Grayscale', 'BTC_Archive',
+        'lopp', 'APompliano', 'JoeBGrech', 'ErikVoorhees', '_Checkmatey_',
+        'cz_binance', 'CryptoDonAlt', 'woonomic', 'PeterSchiff', 'saylor',
+        'spencernoon', 'RaoulGMI', 'cburniske', 'VitalikButerin', 'BTCTN']
+
+user_ids = []
+for user in users:
+    user_ids.append(api.get_user(screen_name=user).id)
+
+stream_tweet.filter(follow=user_ids)
+
+# Create DataFrame
+columns = ['tweet', 'user', 'time']
+
+# List of tweets will be saved in below variable.
+data = []
+
+# Iterate and store tweets.
+
+for tweet in stream_tweet.tweets:
+    if "RT @" in tweet.text:
+        pass
+    else:
+        if not tweet.truncated:
+            data.append([tweet.text, tweet.user.screen_name, tweet.created_at])
+        else:
+            data.append([tweet.extended_tweet['full_text'], tweet.user.screen_name, tweet.created_at])
+
+# Converting all the data into dataframe.
+df = pd.DataFrame(data, columns=columns)
+
+# Tweet is the index.
+df = df.set_index('tweet')
+
+# Adding data extraction timestamp.
+df.insert(2, 'extraction_timestamp', pd.to_datetime('now').replace(microsecond=0))
+
+# Resetting date as index.
+df = df.reset_index()
+
+# Connect to Postgres DB.
+engine = sql.create_engine("postgresql://postgres:----@localhost/CryptoSocial")
+conn = engine.connect()
+print('Conneted!')
+
+# Load data from DF to DB.
+df.to_sql("twitter_real_time_user",con=conn, if_exists='append', index=False)
+print("Records are added in DB")
+
+# Close the connection to Postgres DB.
+conn.close()

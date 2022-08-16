@@ -487,6 +487,113 @@ Below visuals show different dashboards created in Power BI.
 
 ![image](https://user-images.githubusercontent.com/99619460/184985127-b970f567-c42e-4e69-9ef5-8dc24cca539f.png)
 
+### 4.8. Power BI Service
+
+Power BI Dashboard is hosted on the Power BI service. Below visual shows how the dataset is connected to the Power BI gateway and displayed via the Power BI dashboard.
+ 
+![image](https://user-images.githubusercontent.com/99619460/184985236-fcbb1661-da69-42b6-9030-09b7467de443.png)
+
+Data is refreshed every 3 hours.
+
+![image](https://user-images.githubusercontent.com/99619460/184985270-9dba9367-ed0a-48cb-8e44-ee60bff7a901.png)
+
+## 5. ML Engineering Pipeline
+
+The below visual explains the machine learning engineering pipeline.
+
+![image](https://user-images.githubusercontent.com/99619460/184985357-6b9ac63a-1e44-40d2-80b1-62671426bba9.png)
+
+### 5.1. Streamlit Application
+
+Power BI service provides an HTML link that can be used to embed the Power BI dashboard on any website. Streamlit is a Python framework that is used for building web applications. The Power BI dashboard link is
+embedded inside the Streamlit application.
+
+![image](https://user-images.githubusercontent.com/99619460/184985419-bae1b15b-8015-4373-9135-c4fe447cc23f.png)
+
+### 5.2. Containerize Application
+
+Docker helps package the Streamlit application file deployed to AWS for hosting.
+
+![image](https://user-images.githubusercontent.com/99619460/184985485-750b1450-0a99-4c31-a325-2021b4ab8614.png)
+
+Below files are used as part of containerizing the Streamlit application.
+
+#### 5.2.1. Streamlit Application File
+
+This file has the code for the Streamlit application.
+
+Script - https://github.com/Data-Practitioner/Crypto-Data-Metric/blob/main/ml_engineering_pipeline/streamlit_application_file
+
+#### 5.2.2. Docker File
+
+Docker File is used for packaging the containerized Streamlit application.
+
+Script - https://github.com/Data-Practitioner/Crypto-Data-Metric/blob/main/ml_engineering_pipeline/docker_file
+
+#### 5.2.2. Requirement Txt File
+
+Requirement Txt file is used for Python package dependency.
+
+Script - https://github.com/Data-Practitioner/Crypto-Data-Metric/blob/main/ml_engineering_pipeline/requirement_txt_file
+
+### 5.3. Deploy Application
+
+Docker image file is uploaded AWS ECR → AWS ECR code is linked in AWS Fargate where the application is running → Cryptodatametric.com is domain is registered via Route 53 → AWS Fargate IP address is linked to Cryptodatametric.com so it will redirect traffic to the actual website rather than IP address.
+
+![image](https://user-images.githubusercontent.com/99619460/184986236-3fcea828-abab-42aa-a64f-adf8275cb9f0.png)
 
 
+## Conclusion
 
+The project can be viewed at the below link.
+
+Website ⇒ http://www.cryptodatametric.com:8501/
+
+Below goals are completed. 
+
+o  Descriptive Analytics – What is the price of Bitcoin and Ethereum? 
+
+The dashboard displays the price of both along with changes from 1hour, 24 hours, and seven days ago.
+
+![image](https://user-images.githubusercontent.com/99619460/184986318-34e21049-c625-4ba6-a8f3-dddfa090a2e8.png)
+
+o  Diagnostic Analytics – Why is the price of Bitcoin and Ethereum going up or down? <br>
+• Identify important social, on-chain, andgeneral statistical KPIs which affect the price. <br>
+• Display the public’s sentiment on Bitcoin and Ethereum, which affect the price. <br>
+
+The dashboard displays general, on-chain, social, and sentimental statistics that affect the price of Bitcoin.
+
+![image](https://user-images.githubusercontent.com/99619460/184986471-38b88909-99a2-4bb8-bd67-c033af4395d3.png)
+
+The dashboard displays general, on-chain, social, and sentimental statistics that affect the price of Ethereum.
+
+![image](https://user-images.githubusercontent.com/99619460/184986496-359951d3-0672-44f3-9caf-c9baaa6f605f.png)
+
+o  Predictive Analytics – What will be the future price of Bitcoin and Ethereum? 
+
+The Dashboard displays the predicted price of Bitcoin and Ethereum.
+
+![image](https://user-images.githubusercontent.com/99619460/184986537-58a05954-cc93-4f04-8f10-45b32c031377.png)
+
+o  Prescriptive Analytics – What decision should be taken knowing the future price of Bitcoin and Ethereum? <br>
+• Trading Signal – Buy or Sell. <br>
+
+The dashboard displays the buy and sell trading signal on Bitcoin and Ethereum.
+
+![image](https://user-images.githubusercontent.com/99619460/184986614-7528ebdf-f073-49f7-9ed2-bbef9019a94c.png)
+
+o  Launch this product under the Crypto DataMetric domain. <br>
+• Build the dashboard as a web application. <br>
+• Link the web application to cryptodatametric.com. <br>
+
+This is the main dashboard page where anyone can select Bitcoin or Ethereum to view its dashboard.
+
+![image](https://user-images.githubusercontent.com/99619460/184986696-30c2a6b8-ad7a-46e0-9f4c-05e4ca110933.png)
+
+Different layers of analytics for Bitcoin are captured in this single dashboard.
+
+![image](https://user-images.githubusercontent.com/99619460/184986720-bca2c5b0-f08c-4958-8a06-13d04b8dfeb9.png)
+
+Also, different layers of analytics for Ethereum are captured in this single dashboard.
+
+![image](https://user-images.githubusercontent.com/99619460/184986749-099d96a8-3fa9-458d-a3ae-c955c5130231.png)

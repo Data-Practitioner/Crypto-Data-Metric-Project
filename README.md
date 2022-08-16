@@ -419,7 +419,7 @@ Python Script - https://github.com/Data-Practitioner/Crypto-Data-Metric/blob/mai
 
 ![image](https://user-images.githubusercontent.com/99619460/184982950-84a6d4fa-9066-4332-9e32-66eb90e11443.png)
 
-### 3.2.2. Scripts
+#### 3.2.2. Scripts
 
 Reddit Comments - https://github.com/Data-Practitioner/Crypto-Data-Metric/blob/main/data_science_ml_pipeline/reddit_comments
 
@@ -428,5 +428,55 @@ Twitter User Tweets - https://github.com/Data-Practitioner/Crypto-Data-Metric/bl
 Crypto News - https://github.com/Data-Practitioner/Crypto-Data-Metric/blob/main/data_science_ml_pipeline/crypto_news
 
 All the scripts runs automatically at set intervals throughout the day via Windows Task Scheduler.
+
+## 4. Data Analytics/Data Visualization Pipeline
+
+The below visual explains the data analytics/visualization pipeline.
+
+![image](https://user-images.githubusercontent.com/99619460/184983797-96aeadaa-88f6-4797-a219-5e030a825be5.png)
+
+
+### 4.1. Table & Flowchart
+
+Below, analytical and ml tables are extracted from the data warehouse and database for data analytics/visualization.
+
+![image](https://user-images.githubusercontent.com/99619460/184983879-718f097d-d4c8-4eb2-be5d-7872f432964d.png)
+
+![image](https://user-images.githubusercontent.com/99619460/184983894-db854904-bfcf-4b6c-ae73-f80387eb4c4c.png)
+
+### 4.2. Power BI Gateway
+
+Power BI Gateway serves as a bridge between on-premises data, and Power BI. Power BI Gateway is connected to Postgres data warehouse to get the data and source it to Power BI.
+
+### 4.3. Power Query
+
+All the data is transformed and prepped for data aggregation. Below graphic shows how different queries are dependent. 
+
+![image](https://user-images.githubusercontent.com/99619460/184983987-7941f192-9ab7-4ffd-8793-93b7601a5642.png)
+
+M Scripts - https://github.com/Data-Practitioner/Crypto-Data-Metric/blob/main/data_analytics_visualization_pipeline/m_scripts
+
+### 4.4. DAX
+
+Below, measures are calculated using DAX in Power BI. All these measures are used for data analytics/visualization.
+
+DAX Code - https://github.com/Data-Practitioner/Crypto-Data-Metric/blob/main/data_analytics_visualization_pipeline/dax
+
+### 4.5. Data Modeling
+The below visual shows only nine tables are part of the data model, and others are standalone tables. The data model helps to load, retrieve, and analyze extensive amounts of data which is crucial for Power BI visuals/dashboards to load quickly. 
+
+![image](https://user-images.githubusercontent.com/99619460/184984639-e3dad46e-7381-49e5-bcca-004150058e39.png)
+
+![image](https://user-images.githubusercontent.com/99619460/184984659-ae1a4ae1-bcf9-4230-afcc-68cd84a0168c.png)
+
+### 4.6. Power BI Report
+
+![image](https://user-images.githubusercontent.com/99619460/184984804-933162ea-3287-42d8-9868-880080a3e765.png)
+
+![image](https://user-images.githubusercontent.com/99619460/184984851-9a763e68-12c6-475d-ba41-057a39265dc9.png)
+
+
+
+
 
 

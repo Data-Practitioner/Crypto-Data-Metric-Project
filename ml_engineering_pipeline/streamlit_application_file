@@ -1,0 +1,12 @@
+# Import library.
+import streamlit.components.v1 as components
+import streamlit as st
+components.html("""
+<div align="center" style="width:100%;">
+<iframe title="Crypto Prediction Project" width="1000" height="600"
+src="https://app.powerbi.com/view?r=eyJrIjoiNmY2MmFjMTMtYzUwZC00MzRkLThkODAtOWRiODU0ZTY0OGU3IiwidCI6ImIxOWQ0NzkxLTc5MmYtNDIwOC1iNTczLTkzYmZiM2QzZTVhOCJ9&pageName=ReportSection349a9df0220208dec8cd" frameborder="0" allowFullScreen="true"> </iframe>
+</div>
+  </div>
+</div>
+"""
+, width = 1000, height=950)

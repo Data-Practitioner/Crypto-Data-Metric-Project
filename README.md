@@ -292,3 +292,22 @@ Data is extracted via API & web scraping, transformed, and loaded into the below
 ![image](https://user-images.githubusercontent.com/99619460/184974030-abb709fb-f582-4d82-938d-80416dbed01a.png)
 
 ![image](https://user-images.githubusercontent.com/99619460/184973997-4669fe29-6384-4d2f-92be-abcb82fa9111.png)
+
+##### 2.2.1.2. Logical Model
+###### 2.2.1.2.1. ERD
+
+![image](https://user-images.githubusercontent.com/99619460/184974224-d01e358b-6928-4dd4-9940-98f642e6bf39.png)
+
+###### 2.2.1.2.2. Trigger Function
+The database needs a trigger function as this facilitates the movement of data from the database to the data warehouse.
+
+###### 2.2.1.2.3. Keys (Primary & Secondary)
+All the tables have the primary and secondary key, so data can be indexed faster, assist with joins, and ensures consistency.
+
+###### 2.2.1.2.4. Relationship
+All the relationships between tables are defined to build structures and prevent redundant data.
+
+###### 2.2.1.2.5. Transactional Data Timestamp
+Each table has an Extraction Timestamp column, providing a log of each record when the data was extracted, transformed, and stored in the database.
+
+######

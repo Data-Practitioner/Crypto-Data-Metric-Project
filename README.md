@@ -126,3 +126,13 @@ Three different Python scripts are running to extract data via API. Below is the
 Ø Bitcoin & Ethereum General Stats <br>
 
 The below section explains each Python script and code linked to the script.
+
+##### 2.1.1.1.1. Bitcoin On-chain Analytics
+
+This script is extracting Bitcoin’s On-chain analytics data from Glassnode.com via API. Python transforms that data and loads it into the Postgres database.
+
+Python Script - https://github.com/Data-Practitioner/Crypto-Data-Metric/blob/main/data_engineering_pipeline/bitcoin_on-chain_analytics
+
+**Data Orchestration**
+
+Windows Task scheduler is running Python script at set intervals throughout the day.

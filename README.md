@@ -97,6 +97,32 @@ Programming (SQL and Python) <br>
 #### 1.6.3. Unstructured Data - API
 ![image](https://user-images.githubusercontent.com/99619460/184965456-ed12fd6f-4eb6-486b-895a-006832f2f678.png)
 
+## 2. Data Engineering Pipeline
+The below visual explains the data engineering pipeline required to build the product.
 
+![image](https://user-images.githubusercontent.com/99619460/184965611-65984931-800b-44a8-8f74-f366258cfbfd.png)
 
+### 2.1. ETL Pipeline
 
+The ETL pipeline is a set of processes used to move data from one source or multiple sources into a database. The three interdependent steps include extraction, transformation, and loading so that data can be integrated from various sources and stored in one centralized source (database).
+
+#### 2.1.1. Structured Data
+
+All structured data is extracted via API and web scraping.
+
+Below is the flowchart of the process.
+
+![image](https://user-images.githubusercontent.com/99619460/184965772-f7d86c0d-b7b5-4f2e-934c-8ae2fe1ec25b.png)
+
+#### 2.1.1.1. API
+Data is extracted via API, transformed using Python, and loaded into Postgres Database. All the Python scripts are automatically running at set intervals using the windows task scheduler.
+
+Below is a flowchart of the process.
+![image](https://user-images.githubusercontent.com/99619460/184965926-67ba91e6-94f2-41ca-81fb-3e829f9d6cbb.png)
+
+Three different Python scripts are running to extract data via API. Below is the list of files. <br>
+Ø Bitcoin On-chain Analytics <br>
+Ø Ethereum On-chain Analytics <br>
+Ø Bitcoin & Ethereum General Stats <br>
+
+The below section explains each Python script and code linked to the script.

@@ -1,0 +1,265 @@
+Bitcoin_Arima_Model_Prediction
+    let
+	    Source = Value.NativeQuery(PostgreSQL.Database("localhost", "CryptoMetric", [HierarchicalNavigation=true]), "SELECT date_time,#(lf)       predicted_value#(lf)FROM ml_db.arima_pred_btc_ml_db#(lf)ORDER BY arima_pred_btc_ml_db.arima_pred_btc_ml_db_id DESC#(lf)LIMIT 48", null, [EnableFolding=true]),
+	    #"Sorted Rows" = Table.Sort(Source,{{"date_time", Order.Ascending}}),
+	    #"Renamed Columns" = Table.RenameColumns(#"Sorted Rows",{{"date_time", "Date_Time"}, {"predicted_value", "Predicted_Value"}}),
+	    #"Added Custom" = Table.AddColumn(#"Renamed Columns", "Crypto_ID", each 1),
+	    #"Reordered Columns" = Table.ReorderColumns(#"Added Custom",{"Crypto_ID", "Date_Time", "Predicted_Value"}),
+	    #"Changed Type" = Table.TransformColumnTypes(#"Reordered Columns",{{"Crypto_ID", Int64.Type}}),
+	    #"Renamed Columns1" = Table.RenameColumns(#"Changed Type",{{"Date_Time", "Date & Time"}, {"Predicted_Value", "Predicted Value"}}),
+	    #"Changed Type1" = Table.TransformColumnTypes(#"Renamed Columns1",{{"Date & Time", type datetimezone}}),
+	    #"Added Custom1" = Table.AddColumn(#"Changed Type1", "Date & Time UTC", each DateTimeZone.ToUtc([#"Date & Time"])),
+	    #"Changed Type2" = Table.TransformColumnTypes(#"Added Custom1",{{"Date & Time UTC", type datetimezone}}),
+	    #"Reordered Columns1" = Table.ReorderColumns(#"Changed Type2",{"Crypto_ID", "Date & Time", "Date & Time UTC", "Predicted Value"})
+	in
+	    #"Reordered Columns1"
+
+Ethereum_Arima_Model_Prediction
+    let
+	    Source = Value.NativeQuery(PostgreSQL.Database("localhost", "CryptoMetric", [HierarchicalNavigation=true]), "SELECT date_time,#(lf)       predicted_value#(lf)#(lf)FROM ml_db.arima_pred_eth_ml_db#(lf)ORDER BY arima_pred_eth_ml_db.arima_pred_eth_ml_db_id DESC#(lf)LIMIT 48", null, [EnableFolding=true]),
+	    #"Sorted Rows" = Table.Sort(Source,{{"date_time", Order.Ascending}}),
+	    #"Renamed Columns" = Table.RenameColumns(#"Sorted Rows",{{"date_time", "Date_Time"}, {"predicted_value", "Predicted_Value"}}),
+	    #"Added Custom" = Table.AddColumn(#"Renamed Columns", "Crypto_ID", each 2),
+	    #"Reordered Columns" = Table.ReorderColumns(#"Added Custom",{"Crypto_ID", "Date_Time", "Predicted_Value"}),
+	    #"Changed Type" = Table.TransformColumnTypes(#"Reordered Columns",{{"Crypto_ID", Int64.Type}, {"Date_Time", type datetimezone}}),
+	    #"Added Custom1" = Table.AddColumn(#"Changed Type", "Date & Time UTC", each DateTimeZone.ToUtc([Date_Time])),
+	    #"Reordered Columns1" = Table.ReorderColumns(#"Added Custom1",{"Crypto_ID", "Date_Time", "Date & Time UTC", "Predicted_Value"}),
+	    #"Changed Type1" = Table.TransformColumnTypes(#"Reordered Columns1",{{"Date & Time UTC", type datetimezone}}),
+	    #"Renamed Columns1" = Table.RenameColumns(#"Changed Type1",{{"Predicted_Value", "Predicted Value"}})
+	in
+	    #"Renamed Columns1"
+
+Ethereum_Onchain_Analytics_Stats
+    let
+	    Source = PostgreSQL.Database("localhost", "CryptoMetric", [HierarchicalNavigation=true]),
+	    staging_db = Source{[Schema="staging_db"]}[Data],
+	    eth_onchain_analytics_staging_db1 = staging_db{[Name="eth_onchain_analytics_staging_db"]}[Data],
+	    #"Removed Columns" = Table.RemoveColumns(eth_onchain_analytics_staging_db1,{"eth_onchain_id", "extraction_timestamp"}),
+	    #"Renamed Columns" = Table.RenameColumns(#"Removed Columns",{{"date", "Updated_Date"}, {"crypto_id", "Crypto_ID"}, {"total_address", "Total_Address"}, {"new_address", "New_Address"}, {"active_address", "Active_Address"}, {"transaction_count", "Transaction_Count"}, {"transfers_volume_sum", "Transfer_Volume_Sum"}}),
+	    #"Reordered Columns" = Table.ReorderColumns(#"Renamed Columns",{"Crypto_ID", "Total_Address", "New_Address", "Active_Address", "Transaction_Count", "Transfer_Volume_Sum", "Updated_Date"}),
+	    #"Removed Columns1" = Table.RemoveColumns(#"Reordered Columns",{"Total_Address"}),
+	    #"Renamed Columns1" = Table.RenameColumns(#"Removed Columns1",{{"Updated_Date", "Date"}, {"Transaction_Count", "Transactions"}, {"New_Address", "New Address"}, {"Active_Address", "Active Address"}, {"Transfer_Volume_Sum", "Transfer Volume"}}),
+	    #"Filtered Rows" = Table.SelectRows(#"Renamed Columns1", each Date.IsInPreviousNDays([Date], 30))
+	in
+	    #"Filtered Rows"
+
+Ethereum_Social_Stats
+    let
+	    Source = PostgreSQL.Database("localhost", "CryptoMetric", [HierarchicalNavigation=true]),
+	    staging_db = Source{[Schema="staging_db"]}[Data],
+	    etherium_social_stats_staging_db1 = staging_db{[Name="etherium_social_stats_staging_db"]}[Data],
+	    #"Removed Columns" = Table.RemoveColumns(etherium_social_stats_staging_db1,{"etherium_social_id", "extraction_timestamp"}),
+	    #"Renamed Columns" = Table.RenameColumns(#"Removed Columns",{{"crypto_id", "Crypto_ID"}, {"etherium_reddit_subscribers", "ETH_Reddit_Subscribers"}, {"etherium_tweets_count", "ETH_Tweets_Count"}, {"updated_timestamp", "Updated_Timestamp"}}),
+	    #"Removed Duplicates" = Table.Distinct(#"Renamed Columns"),
+	    #"Filtered Rows" = Table.SelectRows(#"Removed Duplicates", each Date.IsInPreviousNDays([Updated_Timestamp], 30)),
+	    #"Renamed Columns1" = Table.RenameColumns(#"Filtered Rows",{{"ETH_Tweets_Count", "ETH Tweets"}, {"Updated_Timestamp", "Date"}}),
+	    #"Changed Type" = Table.TransformColumnTypes(#"Renamed Columns1",{{"Date", type date}})
+	in
+	    #"Changed Type"
+
+Crypto_List
+    let
+	    Source = PostgreSQL.Database("localhost", "CryptoMetric", [HierarchicalNavigation=true]),
+	    staging_db = Source{[Schema="staging_db"]}[Data],
+	    crypto_list_dim1 = staging_db{[Name="crypto_list_dim"]}[Data],
+	    #"Renamed Columns" = Table.RenameColumns(crypto_list_dim1,{{"crypto_id", "Crypto_ID"}, {"symbol", "Symbol"}, {"name", "Name"}}),
+	    #"Filtered Rows" = Table.SelectRows(#"Renamed Columns", each ([Crypto_ID] = 1 or [Crypto_ID] = 2))
+	in
+	    #"Filtered Rows"
+
+Bitcoin_Onchain_Analytics_Stats
+    let
+	    Source = PostgreSQL.Database("localhost", "CryptoMetric", [HierarchicalNavigation=true]),
+	    staging_db = Source{[Schema="staging_db"]}[Data],
+	    btc_onchain_analytics_staging_db1 = staging_db{[Name="btc_onchain_analytics_staging_db"]}[Data],
+	    #"Removed Columns" = Table.RemoveColumns(btc_onchain_analytics_staging_db1,{"btc_onchain_id", "extraction_timestamp"}),
+	    #"Renamed Columns" = Table.RenameColumns(#"Removed Columns",{{"date", "Updated_Date"}, {"crypto_id", "Crypto_ID"}, {"total_address", "Total_Address"}, {"new_address", "New_Address"}, {"active_address", "Active_Address"}, {"etf_flows", "ETF_Flows"}, {"transaction_count", "Transaction_Count"}, {"transfers_volume_sum", "Transfer_Volume_Sum"}, {"stock_to_flow_ratio", "Stock_To_Flow_Ratio"}}),
+	    #"Reordered Columns" = Table.ReorderColumns(#"Renamed Columns",{"Crypto_ID", "Total_Address", "New_Address", "Active_Address", "ETF_Flows", "Transaction_Count", "Transfer_Volume_Sum", "Stock_To_Flow_Ratio", "Updated_Date"}),
+	    #"Removed Columns1" = Table.RemoveColumns(#"Reordered Columns",{"Stock_To_Flow_Ratio"}),
+	    #"Filtered Rows" = Table.SelectRows(#"Removed Columns1", each Date.IsInPreviousNDays([Updated_Date], 30)),
+	    #"Removed Columns2" = Table.RemoveColumns(#"Filtered Rows",{"Total_Address", "ETF_Flows"}),
+	    #"Renamed Columns1" = Table.RenameColumns(#"Removed Columns2",{{"Active_Address", "Active Address"}, {"Transaction_Count", "Transactions"}, {"New_Address", "New Address"}, {"Transfer_Volume_Sum", "Transfer Volume"}, {"Updated_Date", "Date"}})
+	in
+	    #"Renamed Columns1"
+
+Bitcoin_Social_Stats
+    let
+	    Source = PostgreSQL.Database("localhost", "CryptoMetric", [HierarchicalNavigation=true]),
+	    staging_db = Source{[Schema="staging_db"]}[Data],
+	    bitcoin_social_stats_staging_db1 = staging_db{[Name="bitcoin_social_stats_staging_db"]}[Data],
+	    #"Removed Columns" = Table.RemoveColumns(bitcoin_social_stats_staging_db1,{"bitcoin_social_id", "extraction_timestamp"}),
+	    #"Renamed Columns" = Table.RenameColumns(#"Removed Columns",{{"crypto_id", "Crypto ID"}, {"bitcoin_reddit_subscribers", "BTC Reddit Subscribers"}, {"bitcoin_tweets_count", "BTC Tweet Counts"}, {"updated_timestamp", "Date"}}),
+	    #"Removed Duplicates" = Table.Distinct(#"Renamed Columns"),
+	    #"Filtered Rows" = Table.SelectRows(#"Removed Duplicates", each Date.IsInPreviousNDays([Date], 30)),
+	    #"Changed Type" = Table.TransformColumnTypes(#"Filtered Rows",{{"Date", type date}}),
+	    #"Renamed Columns1" = Table.RenameColumns(#"Changed Type",{{"BTC Tweet Counts", "BTC Tweets"}})
+	in
+	    #"Renamed Columns1"
+
+Measure_Bitcoin_Onchain_Analytics_Stats
+    let
+	    Source = Table.FromRows(Json.Document(Binary.Decompress(Binary.FromText("i44FAA==", BinaryEncoding.Base64), Compression.Deflate)), let _t = ((type nullable text) meta [Serialized.Text = true]) in type table [Bitcoin_Onchain_Analytics_Measure = _t]),
+	    #"Changed Type" = Table.TransformColumnTypes(Source,{{"Bitcoin_Onchain_Analytics_Measure", type text}}),
+	    #"Removed Columns" = Table.RemoveColumns(#"Changed Type",{"Bitcoin_Onchain_Analytics_Measure"})
+	in
+	    #"Removed Columns"
+
+Measure_Bitcoin_Social_Stats
+    let
+	    Source = Table.FromRows(Json.Document(Binary.Decompress(Binary.FromText("i44FAA==", BinaryEncoding.Base64), Compression.Deflate)), let _t = ((type nullable text) meta [Serialized.Text = true]) in type table [Measure_Bitcoin_Social_Stats = _t]),
+	    #"Changed Type" = Table.TransformColumnTypes(Source,{{"Measure_Bitcoin_Social_Stats", type text}}),
+	    #"Removed Columns" = Table.RemoveColumns(#"Changed Type",{"Measure_Bitcoin_Social_Stats"})
+	in
+	    #"Removed Columns"
+
+Bitcoin_General_Stats
+    let
+	    Source = Crypto_General_Stats,
+	    #"Filtered Rows" = Table.SelectRows(Source, each ([Symbol] = "BTC")),
+	    #"Removed Columns" = Table.RemoveColumns(#"Filtered Rows",{"Name", "Symbol"}),
+	    #"Filtered Rows1" = Table.SelectRows(#"Removed Columns", let latest = List.Max(#"Removed Columns"[Updated_Timestamp]) in each [Updated_Timestamp] = latest)
+	in
+	    #"Filtered Rows1"
+
+Ethereum_General_Stats	let
+	    Source = Crypto_General_Stats,
+	    #"Filtered Rows" = Table.SelectRows(Source, each ([Name] = "Ethereum")),
+	    #"Removed Columns" = Table.RemoveColumns(#"Filtered Rows",{"Name", "Symbol"}),
+	    #"Filtered Rows1" = Table.SelectRows(#"Removed Columns", let latest = List.Max(#"Removed Columns"[Updated_Timestamp]) in each [Updated_Timestamp] = latest)
+	in
+	    #"Filtered Rows1"
+
+Measure_Bitcoin_General_Stats
+    let
+	    Source = Table.FromRows(Json.Document(Binary.Decompress(Binary.FromText("i44FAA==", BinaryEncoding.Base64), Compression.Deflate)), let _t = ((type nullable text) meta [Serialized.Text = true]) in type table [Measure_Bitcoin_General_Stats = _t]),
+	    #"Changed Type" = Table.TransformColumnTypes(Source,{{"Measure_Bitcoin_General_Stats", type text}}),
+	    #"Removed Columns" = Table.RemoveColumns(#"Changed Type",{"Measure_Bitcoin_General_Stats"})
+	in
+	    #"Removed Columns"
+
+Measure_Ethereum_General_Stats	let
+	    Source = Table.FromRows(Json.Document(Binary.Decompress(Binary.FromText("i44FAA==", BinaryEncoding.Base64), Compression.Deflate)), let _t = ((type nullable text) meta [Serialized.Text = true]) in type table [Measure_Ethereum_General_Stats = _t]),
+	    #"Changed Type" = Table.TransformColumnTypes(Source,{{"Measure_Ethereum_General_Stats", type text}}),
+	    #"Removed Columns" = Table.RemoveColumns(#"Changed Type",{"Measure_Ethereum_General_Stats"})
+	in
+	    #"Removed Columns"
+
+Measure_Ethereum_Onchain_Analytics_Stats
+    let
+	    Source = Table.FromRows(Json.Document(Binary.Decompress(Binary.FromText("i44FAA==", BinaryEncoding.Base64), Compression.Deflate)), let _t = ((type nullable text) meta [Serialized.Text = true]) in type table [Measure_Ethereum_Onchain_Analytics_Stats = _t]),
+	    #"Changed Type" = Table.TransformColumnTypes(Source,{{"Measure_Ethereum_Onchain_Analytics_Stats", type text}}),
+	    #"Removed Columns" = Table.RemoveColumns(#"Changed Type",{"Measure_Ethereum_Onchain_Analytics_Stats"})
+	in
+	    #"Removed Columns"
+
+Measure_Ethereum_Social_Stats
+    let
+	    Source = Table.FromRows(Json.Document(Binary.Decompress(Binary.FromText("i44FAA==", BinaryEncoding.Base64), Compression.Deflate)), let _t = ((type nullable text) meta [Serialized.Text = true]) in type table [Measure_Etherium_Social_Stats = _t]),
+	    #"Changed Type" = Table.TransformColumnTypes(Source,{{"Measure_Etherium_Social_Stats", type text}}),
+	    #"Removed Columns" = Table.RemoveColumns(#"Changed Type",{"Measure_Etherium_Social_Stats"})
+	in
+	    #"Removed Columns"
+
+Bitcoin_Crypto_News
+    let
+	    Source = Crypto_News,
+	    #"Filtered Rows" = Table.SelectRows(Source, each ([Crypto_Label] = "bitcoin"))
+	in
+	    #"Filtered Rows"
+
+Bitcoin_Reddit_Comments
+    let
+	    Source = Reddit_Comments,
+	    #"Filtered Rows" = Table.SelectRows(Source, each ([Crypto_Label] = "bitcoin"))
+	in
+	    #"Filtered Rows"
+
+Bitcoin_Twitter_Comments
+    let
+	    Source = Twitter_Comments,
+	    #"Filtered Rows" = Table.SelectRows(Source, each ([Crypto_Label] = "bitcoin"))
+	in
+	    #"Filtered Rows"
+
+Ethereum_Crypto_News
+    let
+	    Source = Crypto_News,
+	    #"Filtered Rows" = Table.SelectRows(Source, each ([Crypto_Label] = "ethereum"))
+	in
+	    #"Filtered Rows"
+
+Ethereum_Reddit_Comments
+    let
+	    Source = Reddit_Comments,
+	    #"Filtered Rows" = Table.SelectRows(Source, each ([Crypto_Label] = "ethereum"))
+	in
+	    #"Filtered Rows"
+
+Ethereum_Twitter_Comments
+    let
+	    Source = Twitter_Comments,
+	    #"Filtered Rows" = Table.SelectRows(Source, each ([Crypto_Label] = "ethereum"))
+	in
+	    #"Filtered Rows"
+
+Measure_Polarity_Score
+    let
+	    Source = Table.FromRows(Json.Document(Binary.Decompress(Binary.FromText("i44FAA==", BinaryEncoding.Base64), Compression.Deflate)), let _t = ((type nullable text) meta [Serialized.Text = true]) in type table [Measure_Polarity_Score = _t]),
+	    #"Changed Type" = Table.TransformColumnTypes(Source,{{"Measure_Polarity_Score", type text}}),
+	    #"Removed Columns" = Table.RemoveColumns(#"Changed Type",{"Measure_Polarity_Score"})
+	in
+	    #"Removed Columns"
+
+Data_Refresh
+    let
+	    Source = DateTime.LocalNow(),
+	    #"Converted to Table" = #table(1, {{Source}}),
+	    #"Renamed Columns" = Table.RenameColumns(#"Converted to Table",{{"Column1", "Data Refresh"}}),
+	    #"Changed Type" = Table.TransformColumnTypes(#"Renamed Columns",{{"Data Refresh", type datetimezone}}),
+	    #"Added Custom" = Table.AddColumn(#"Changed Type", "Data Refresh UTC", each DateTimeZone.ToUtc([Data Refresh])),
+	    #"Removed Columns" = Table.RemoveColumns(#"Added Custom",{"Data Refresh"}),
+	    #"Renamed Columns1" = Table.RenameColumns(#"Removed Columns",{{"Data Refresh UTC", "DateTime"}}),
+	    #"Inserted Date" = Table.AddColumn(#"Renamed Columns1", "Date", each DateTime.Date([DateTime]), type date),
+	    #"Inserted Time" = Table.AddColumn(#"Inserted Date", "Time", each DateTime.Time([DateTime]), type time)
+	in
+	    #"Inserted Time"
+
+Ethereum_Google_Trends_KPI
+    let
+	    Source = Ethereum_Google_Trends,
+	    #"Filtered Rows" = Table.SelectRows(Source, each ([ETH Trend] <> 0)),
+	    #"Added Custom" = Table.AddColumn(#"Filtered Rows", "Percent Change ETH Trend Score", each ([ETH Trend] - [ETH Trend]-1)/[ETH Trend]),
+	    #"Changed Type" = Table.TransformColumnTypes(#"Added Custom",{{"Percent Change ETH Trend Score", Percentage.Type}}),
+	    #"Filtered Rows1" = Table.SelectRows(#"Changed Type", let latest = List.Max(#"Changed Type"[Date]) in each [Date] = latest),
+	    #"Changed Type1" = Table.TransformColumnTypes(#"Filtered Rows1",{{"Date", type date}})
+	in
+	    #"Changed Type1"
+
+Bitcoin_Google_Trends
+    let
+	    Source = Google_Trends,
+	    #"Removed Columns" = Table.RemoveColumns(Source,{"Ethereum"}),
+	    #"Reordered Columns" = Table.ReorderColumns(#"Removed Columns",{"Bitcoin", "Date"}),
+	    #"Renamed Columns" = Table.RenameColumns(#"Reordered Columns",{{"Bitcoin", "BTC Trend"}})
+	in
+	    #"Renamed Columns"
+
+Bitcoin_Google_Trends_KPI
+    let
+	    Source = Bitcoin_Google_Trends,
+	    #"Filtered Rows" = Table.SelectRows(Source, each ([BTC Trend] <> 0)),
+	    #"Added Custom" = Table.AddColumn(#"Filtered Rows", "Percent Change BTC Trend Score", each ([BTC Trend] - [BTC Trend]-1)/[BTC Trend]),
+	    #"Changed Type" = Table.TransformColumnTypes(#"Added Custom",{{"Percent Change BTC Trend Score", Percentage.Type}}),
+	    #"Filtered Rows1" = Table.SelectRows(#"Changed Type", let latest = List.Max(#"Changed Type"[Date]) in each [Date] = latest),
+	    #"Changed Type1" = Table.TransformColumnTypes(#"Filtered Rows1",{{"Date", type date}})
+	in
+	    #"Changed Type1"
+
+Ethereum_Google_Trends
+    let
+	    Source = Google_Trends,
+	    #"Removed Columns" = Table.RemoveColumns(Source,{"Bitcoin"}),
+	    #"Reordered Columns" = Table.ReorderColumns(#"Removed Columns",{"Ethereum", "Date"}),
+	    #"Renamed Columns" = Table.RenameColumns(#"Reordered Columns",{{"Ethereum", "ETH Trend"}})
+	in
+	    #"Renamed Columns"

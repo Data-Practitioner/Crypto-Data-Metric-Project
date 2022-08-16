@@ -118,6 +118,7 @@ Below is the flowchart of the process.
 Data is extracted via API, transformed using Python, and loaded into Postgres Database. All the Python scripts are automatically running at set intervals using the windows task scheduler.
 
 Below is a flowchart of the process.
+
 ![image](https://user-images.githubusercontent.com/99619460/184965926-67ba91e6-94f2-41ca-81fb-3e829f9d6cbb.png)
 
 Three different Python scripts are running to extract data via API. Below is the list of files. <br>
@@ -148,5 +149,30 @@ Data Orchestration - Windows Task scheduler is running Python script at set inte
 This script extracts Bitcoin and Ethereum’s general data from Coinmarketcap.com via API. Python transforms that data and loads it into the Postgres database.
 
 Python Script - https://github.com/Data-Practitioner/Crypto-Data-Metric/blob/main/data_engineering_pipeline/bitcoin_%26_ethereum_general_stats
+
+Data Orchestration - Windows Task scheduler is running Python script at set intervals throughout the day.
+
+#### 2.1.1.2. Web Scraping
+
+Data is extracted via web scraping, transformed using Python, and loaded into Postgres Database. All the Python scripts are automatically running at set intervals using the windows task scheduler.
+
+Below is a flowchart of the process.
+
+![image](https://user-images.githubusercontent.com/99619460/184968459-2fc81a1a-793c-4495-897e-eb744aae75ea.png)
+
+Five different Python scripts are running to extract data via web scraping. Below is the list of files. <br>
+Ø Altcoin Index Stats <br>
+Ø Bitcoin & Ethereum Social Stats <br>
+Ø Bitcoin Network Stats <br>
+Ø Bitcoin Historical Prices <br>
+Ø Institutional Holdings <br>
+
+The below section explains each Python script and code linked to the script.
+
+##### 2.1.1.2.1. Altcoin Index Stats
+
+This script extracts Bitcoin’s performance data compared to altcoins from Blockchaincenter.net via web scraping. Python transforms that data and loads it into the Postgres database.
+
+Python Script - https://github.com/Data-Practitioner/Crypto-Data-Metric/blob/main/data_engineering_pipeline/altcoin_index_stats
 
 Data Orchestration - Windows Task scheduler is running Python script at set intervals throughout the day.

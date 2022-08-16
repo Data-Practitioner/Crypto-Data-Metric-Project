@@ -280,3 +280,15 @@ Python Script - https://github.com/Data-Practitioner/Crypto-Data-Metric/blob/mai
 
 Data Orchestration - Windows Task scheduler is running Python script at set intervals throughout the day.
 
+### 2.2. Database Design
+
+Database design is a crucial aspect data lifecycle process. Data collected via API and web scraping must be stored in a database for data analytics and machine learning. 
+
+#### 2.2.1. Structured Data
+##### 2.2.1.1. Table & Flowchart
+
+Data is extracted via API & web scraping, transformed, and loaded into the below tables in Postgres Database.
+
+![image](https://user-images.githubusercontent.com/99619460/184974030-abb709fb-f582-4d82-938d-80416dbed01a.png)
+
+![image](https://user-images.githubusercontent.com/99619460/184973997-4669fe29-6384-4d2f-92be-abcb82fa9111.png)

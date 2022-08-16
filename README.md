@@ -351,7 +351,7 @@ All the data is imported via a trigger from the database except All Stats Fact. 
 
 ![image](https://user-images.githubusercontent.com/99619460/184975860-d7c4cb2c-1734-42cb-a6c3-be73a5d077b0.png)
 
-![image](https://user-images.githubusercontent.com/99619460/184975796-280ab8aa-a3cb-4843-a70a-3f65964e4c60.png
+![image](https://user-images.githubusercontent.com/99619460/184975796-280ab8aa-a3cb-4843-a70a-3f65964e4c60.png)
 
 #### 2.3.2. Logical Model
 

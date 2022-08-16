@@ -133,6 +133,20 @@ This script is extracting Bitcoin’s On-chain analytics data from Glassnode.com
 
 Python Script - https://github.com/Data-Practitioner/Crypto-Data-Metric/blob/main/data_engineering_pipeline/bitcoin_on-chain_analytics
 
-**Data Orchestration**
+Data Orchestration - Windows Task scheduler is running Python script at set intervals throughout the day.
 
-Windows Task scheduler is running Python script at set intervals throughout the day.
+##### 2.1.1.1.2. Ethereum On-chain Analytics
+
+This script is extracting Ethereum’s On-chain analytics data from Glassnode.com via API. Python transforms that data and loads it into the Postgres database
+
+Python Script - https://github.com/Data-Practitioner/Crypto-Data-Metric/blob/main/data_engineering_pipeline/ethereum_on-chain_analytics
+
+Data Orchestration - Windows Task scheduler is running Python script at set intervals throughout the day.
+
+##### 2.1.1.1.3. Bitcoin & Ethereum General Stats
+
+This script extracts Bitcoin and Ethereum’s general data from Coinmarketcap.com via API. Python transforms that data and loads it into the Postgres database.
+
+Python Script - https://github.com/Data-Practitioner/Crypto-Data-Metric/blob/main/data_engineering_pipeline/bitcoin_%26_ethereum_general_stats
+
+Data Orchestration - Windows Task scheduler is running Python script at set intervals throughout the day.

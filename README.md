@@ -48,8 +48,8 @@ To bring Crypto Data Metric’s vision to life, the below steps are required.
 Data Extraction - Python (Beautiful Soup, Request, Selenium, Pytrends, Praw, and Tweepy)
 
 Data Storage <br>
-1. Python - Psycopg and SQL Alchemy <br>
-2. Postgres <br>
+• Python - Psycopg and SQL Alchemy <br>
+• Postgres <br>
 
 Data Orchestration - Windows Task Scheduler
 
@@ -58,12 +58,12 @@ Data Mining, Analysis, and Transformation - Python (Pandas, Numpy, Unicode Data,
 Time Series Analysis, Text Mining, and NLP - Python (Sklearn, Feauture Engine, NLTK, Text Blob, Statsmodels, and Pmdarima)
 
 Data Visualization <br>
-1. Python - Matplotlib and Seaborn <br>
-2. Power BI <br>
+• Python - Matplotlib and Seaborn <br>
+• Power BI <br>
 
 Web Application - Python (Streamlit)
 
 Model Deployment <br> 
-1. Docker <br>
-2. AWS <br>
+• Docker <br>
+• AWS <br>
 

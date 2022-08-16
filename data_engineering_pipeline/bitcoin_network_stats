@@ -1,0 +1,50 @@
+# Import all the libraries.
+from selenium import webdriver
+from selenium.webdriver.common.by import By
+from selenium.webdriver.chrome.service import Service
+import pandas as pd
+import time
+import sqlalchemy as sql
+
+# Website to extract.
+website = 'https://coin.dance/#profitability'
+
+# Executing selenium to launch chrome browser.
+path = Service(r'C:\Program Files\Google\Chrome\chromedriver_win32\chromedriver.exe')
+
+# Lanching chrome driver.
+driver = webdriver.Chrome(service=path)
+
+# Loading website.
+driver.get(website)
+
+# Wait for the page to load
+time.sleep(10)
+
+# Variable to store values that is extracted from the website.
+bitcoin_hash_rate = driver.find_element(By.XPATH, '//div[@class="panel-heading"][1]/div[@class="drillDownPanel"]/a[@href="/blocks/hashrate"]//div/h6[1]').text
+bitcoin_network_nodes = driver.find_element(By.XPATH, '//div[@class="panel-heading"][1]/div[@class="drillDownPanel"]/a[@href="https://coin.dance/nodes"]//div/h6').text
+bitcoin_transactions = driver.find_element(By.XPATH, '//div[@class="panel-heading"][1]/div[@class="drillDownPanel"]/a[@href="/blocks/transactions"]//div/h6[1]').text
+updated_status = driver.find_element(By.XPATH, '//div[@class="panel-heading"][1]/div[@class="drillDownPanel"]/a[@href="https://github.com/bitcoin/bitcoin/commits/master"]/h6').text
+
+# Creating a dataframe to store all the scraped data.
+df = pd.DataFrame({'crypto_id': 1,
+                   'metric': ['bitcoin_hash_rate', 'bitcoin_network_nodes', 'bitcoin_transactions'],
+                   'value': [bitcoin_hash_rate, bitcoin_network_nodes, bitcoin_transactions],
+                   'updated_status': [updated_status, updated_status,updated_status],
+                   'extraction_timestamp': pd.to_datetime('now').replace(microsecond=0)})
+
+# Close chrome browserpass
+driver.quit()
+
+# Connect to Postgres DB.
+engine = sql.create_engine("postgresql://postgres:----@localhost/CryptoMetric")
+conn = engine.connect()
+print('Conneted!')
+
+# Load data from DF to DB.
+df.to_sql("bitcoin_network_stats",con=conn, if_exists='append', index= False)
+print("Records are added in DB")
+
+# Close the connection to Postgres DB.
+conn.close()

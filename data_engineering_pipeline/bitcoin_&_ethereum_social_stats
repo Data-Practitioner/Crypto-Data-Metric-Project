@@ -1,0 +1,72 @@
+# Import all the libraries.
+from bs4 import BeautifulSoup
+import requests
+import pandas as pd
+import sqlalchemy as sql
+import datetime as dt
+
+# Get HTML content.
+website = 'https://bitinfocharts.com/'
+result = requests.get(website)
+content = result.text
+soup = BeautifulSoup(content, 'html.parser')
+
+# Restructure HTML code.
+soup.prettify()
+
+# Locate btc & eth reddit subcribers value.
+reddit_subscribers = soup.find(id='t_reddit').get_text(strip=True, separator=' ')
+
+# Transform btc reddit subcribers value from str to int.
+bitcoin_reddit_subscribers = reddit_subscribers.split()[2]
+bitcoin_reddit_subscribers = int(bitcoin_reddit_subscribers.replace(',',''))
+
+# Transform eth reddit subcribers value from str to int.
+ethereum_reddit_subscribers = reddit_subscribers.split()[3]
+ethereum_reddit_subscribers = int(ethereum_reddit_subscribers.replace(',',''))
+
+# Locate btc & eth tweets per day value.
+tweets_per_day = soup.find(id='t_twitter').get_text(strip=True, separator=' ')
+
+# Transform btc tweets per day value from str to int.
+bitcoin_tweets = tweets_per_day.split()[3]
+bitcoin_tweets = int(bitcoin_tweets.replace(',',''))
+
+# Transform eth tweets per day value from str to int.
+ethereum_tweets = tweets_per_day.split()[4]
+ethereum_tweets =int(ethereum_tweets.replace(',',''))
+
+# Locate date & time when reddit subscribers and tweets per day value was updated on the website.
+texts = soup.find_all("small")
+
+# Last updated timestamp.
+updated_timestamp = dt.datetime.strftime(dt.datetime.today(), '%Y-%m-%d')
+
+# Converting the btc data into dataframe.
+df_btc = pd.DataFrame([{'crypto_id': 1,
+                  'bitcoin_reddit_subscribers': bitcoin_reddit_subscribers,
+                  'bitcoin_tweets_count': bitcoin_tweets,
+                  'updated_timestamp': updated_timestamp,
+                  'extraction_timestamp': pd.to_datetime('now').replace(microsecond=0)}])
+
+# Converting the eth data into dataframe.
+df_eth = pd.DataFrame([{'crypto_id': 2,
+                  'ethereum_reddit_subscribers': ethereum_reddit_subscribers,
+                  'ethereum_tweets_count': ethereum_tweets,
+                  'updated_timestamp': updated_timestamp,
+                  'extraction_timestamp': pd.to_datetime('now').replace(microsecond=0)}])
+
+# Connect to Postgres DB.
+engine = sql.create_engine("postgresql://postgres:---@localhost/CryptoMetric")
+conn = engine.connect()
+print('Conneted!')
+
+# Load data from DF to DB table. Append was impletmented so primary key is preserved.
+df_btc.to_sql("bitcoin_social_stats",con=conn, if_exists='append', index = False)
+print("Records are added in bitcoin_social_stats DB")
+
+df_eth.to_sql("ethereum_social_stats",con=conn, if_exists='append', index = False)
+print("Records are added in ethereum_social_stats DB")
+
+# Close the connection to Postgres DB.
+conn.close()

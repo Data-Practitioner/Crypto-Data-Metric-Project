@@ -1,0 +1,39 @@
+# Import libraries.
+import pandas as pd
+import requests
+import sqlalchemy as sql
+
+# Fetch data from below urls.
+base_url = "https://cryptopanic.com/api/posts/?auth_token=9cc3823df94afaacaa4d3d373c3db208df2343ce&kind=news"
+
+# Get JSON data.
+response = requests.get(base_url).json()
+print(response)
+
+# All the data will be stored in below variable.
+title = []
+domain = []
+published_at = []
+
+# Loop through all the JSON nested elements.
+for i in response['results']:
+    title.append(i['title'])
+    domain.append(i['domain'])
+    published_at.append(i['published_at'])
+
+# Convert to pandas dataframe.
+df = pd.DataFrame({'title': title, 'domain': domain,
+                   'published_time': published_at,
+                   'extraction_timestamp': pd.to_datetime('now').replace(microsecond=0)})
+
+# Connect to Postgres DB.
+engine = sql.create_engine("postgresql://postgres:---@localhost/CryptoSocial")
+conn = engine.connect()
+print('Conneted!')
+
+# Load data from DF to DB.
+df.to_sql("crypto_news",con=conn, if_exists='append', index=False)
+print("Records are added in DB")
+
+# Close the connection to Postgres DB.
+conn.close()

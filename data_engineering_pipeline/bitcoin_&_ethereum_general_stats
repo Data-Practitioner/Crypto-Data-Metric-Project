@@ -1,0 +1,86 @@
+# Import Libraries
+import requests
+import pandas as pd
+import sqlalchemy as sql
+
+# Login credentials.
+headers = {
+  'Accepts': 'application/json',
+  'X-CMC_PRO_API_KEY': '---------',
+}
+
+# Criteria for data extraction.
+params = {
+  'start':'1',
+  'limit':'200',
+  'convert':'USD'
+}
+
+# URL from where data is extracted.
+url = 'https://pro-api.coinmarketcap.com/v1/cryptocurrency/listings/latest'
+
+data = requests.get(url, params=params, headers=headers).json()
+
+# Below fields are extracted.
+rank= []
+name = []
+symbol = []
+circulating_supply = []
+total_supply  = []
+max_supply = []
+price = []
+volume_24h = []
+volume_change_24h = []
+percent_change_1h = []
+percent_change_24h = []
+percent_change_7d = []
+market_cap = []
+market_cap_dominance = []
+last_updated = []
+date_added = []
+
+coins = data['data']
+
+# Looping through each coin to get the data.
+for i in coins:
+    rank.append(i['cmc_rank'])
+    name.append(i['name'])
+    symbol.append(i['symbol'])
+    circulating_supply.append(i['circulating_supply'])
+    total_supply.append(i['total_supply'])
+    max_supply.append(i['max_supply'])
+    price.append(i['quote']['USD']['price'])
+    volume_24h.append(i['quote']['USD']['volume_24h'])
+    volume_change_24h.append(i['quote']['USD']['volume_change_24h'])
+    percent_change_1h.append(i['quote']['USD']['percent_change_1h'])
+    percent_change_24h.append(i['quote']['USD']['percent_change_24h'])
+    percent_change_7d.append(i['quote']['USD']['percent_change_7d'])
+    market_cap.append(i['quote']['USD']['market_cap'])
+    market_cap_dominance.append(i['quote']['USD']['market_cap_dominance'])
+    last_updated.append(i['last_updated'])
+    date_added.append(i['date_added'])
+
+# Storing all the information in a dataframe.
+df = pd.DataFrame({'rank': rank, 'name': name, 'symbol': symbol, 'circulating_supply': circulating_supply,
+                   'total_supply': total_supply, 'max_supply': max_supply,  'price': price,
+                   'volume_24h': volume_24h, 'volume_change_24h': volume_change_24h,
+                   'percent_change_1h': percent_change_1h,'percent_change_24h': percent_change_24h,
+                   'percent_change_7d': percent_change_7d, 'market_cap': market_cap,
+                   'market_cap_dominance': market_cap_dominance, 'last_updated': last_updated,
+                   'date_added': date_added,
+                   'extraction_timestamp': pd.to_datetime('now').replace(microsecond=0)})
+
+# Dropping the auto-number column.
+df.drop(df.columns[0], axis=1, inplace=False)
+
+# Connect to Postgres DB.
+engine = sql.create_engine("postgresql://postgres:----@localhost/CryptoMetric")
+conn = engine.connect()
+print('Conneted!')
+
+# Load data from DF to DB.
+df.to_sql("crypto_general_stats",con=conn, if_exists='append', index=False)
+print("Records are added in DB")
+
+# Close the connection to Postgres DB.
+conn.close()

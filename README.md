@@ -387,5 +387,20 @@ Python Script - https://github.com/Data-Practitioner/Crypto-Data-Metric/blob/mai
 
 Data Orchestration - Windows Task scheduler is running Python script at set intervals throughout the day.
 
+## 3. Data Science/ML Pipeline
+The below visual explains the data science/ml pipeline.
 
+![image](https://user-images.githubusercontent.com/99619460/184977540-56588e61-126b-4385-b4da-fc8e232176b4.png)
+
+### 3.1. Timeseries Pipeline
+
+#### 3.1.1. Research Environment
+
+The Data is extracted from the data warehouse used in the timeseries pipeline to predict future Bitcoin and Ethereum prices. The below process reflects how the time series model was implemented in the research environment.
+
+Flowchart
+
+![image](https://user-images.githubusercontent.com/99619460/184977648-5df2d662-e846-49aa-83b1-0fe98fc50264.png)
+
+Python Script - 
 

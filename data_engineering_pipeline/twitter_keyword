@@ -1,0 +1,60 @@
+# Importing libraries.
+import tweepy
+import pandas as pd
+from datetime import date
+import sqlalchemy as sql
+
+# Authenticating twitter credentials.
+api_key = '---'
+api_key_secret = '----'
+access_token = '----'
+access_token_secret = '----'
+
+auth = tweepy.OAuthHandler(api_key, api_key_secret)
+auth.set_access_token(access_token, access_token_secret)
+api = tweepy.API(auth, wait_on_rate_limit = True)
+
+# Columns in the dataframe.
+columns = ['tweet', 'user', 'time']
+
+# List of tweets will be saved in below variable.
+data = []
+
+# Search words for twitter.
+search_words = ['crypto', 'btc', 'eth', 'bitcoin', 'ethereum']
+
+tweets = tweepy.Cursor(api.search_tweets,
+              q=search_words, tweet_mode='extended',
+              lang="en",
+              since_id=date.today()).items()
+
+# Iterate and store tweets.
+for tweet in tweets:
+    if "RT @" in tweet.full_text:
+        pass
+    else:
+        data.append([str(tweet.full_text), str(tweet.user.screen_name), tweet.created_at])
+
+# Converting all the data into dataframe.
+df = pd.DataFrame(data, columns=columns)
+
+# Tweet is the index.
+df = df.set_index('tweet')
+
+# Adding data extraction timestamp.
+df.insert(2, 'extraction_timestamp', pd.to_datetime('now').replace(microsecond=0))
+
+# Resetting date as index.
+df = df.reset_index()
+
+# Connect to Postgres DB.
+engine = sql.create_engine("postgresql://postgres:----@localhost/CryptoSocial")
+conn = engine.connect()
+print('Conneted!')
+
+# Load data from DF to DB.
+df.to_sql("twitter_search_word",con=conn, if_exists='append', index=False)
+print("Records are added in DB")
+
+# Close the connection to Postgres DB.
+conn.close()

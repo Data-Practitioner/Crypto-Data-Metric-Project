@@ -1,0 +1,81 @@
+# Import all the libraries
+from pytrends.request import TrendReq
+import pandas as pd
+import sqlalchemy as sql
+import psycopg2 as ps
+import psycopg2.extras as extras
+
+# Connect to google trends.
+pytrends = TrendReq(hl='en=US')
+
+# List all the keywords.
+all_keywords = ['Blockchain', 'Altcoin', 'Bitcoin', 'Ethereum', 'Crypto']
+keywords = []
+blockchain = []
+
+# Variable values used in build_payload function.
+timeframes = ['today 5-y', 'today 12-m', 'today 3-m', 'today 1-m', 'now 7-d']
+cat = '0'
+geo = ''   # country
+gprop = '' # gprop = [google, news, youtube]
+
+# Update the timeframe based on position index.
+pytrends.build_payload(all_keywords, cat = cat, timeframe = timeframes[3],
+                       geo = geo, gprop= gprop)
+
+# Getting the data over time.
+data = pytrends.interest_over_time()
+
+# Converting all the data into dataframe and removing last column.
+df = pd.DataFrame(data).iloc[:, :5]
+
+# Adding data extraction timestamp.
+df.insert(5, 'extraction_timestamp', pd.to_datetime('now').replace(microsecond=0))
+
+# Saving the data into csv file.
+df.rename(columns={'Blockchain': 'blockchain','Altcoin': 'altcoin',
+                  'Bitcoin': 'bitcoin', 'Ethereum':'ethereum',
+                  'Crypto': 'crypto'}, inplace=True)
+
+# Resetting date as index.
+df = df.reset_index()
+
+# Connect to Postgres DB.
+engine = sql.create_engine("postgresql://postgres:----@localhost/CryptoSocial")
+conn = engine.connect()
+print('Conneted!')
+
+# Connecting to Postgres DB.
+conn = ps.connect(host="localhost",
+                  dbname="CryptoSocial",
+                  port=5432,
+                  user="postgres",
+                  password="----")
+
+# Defining sql function.
+def execute_values(conn, df, table):
+    # Create a list of tupples from the dataframe values
+    tuples = [tuple(x) for x in df.to_numpy()]
+    # Comma-separated dataframe columns
+    cols = ','.join(list(df.columns))
+    # SQL quert to execute
+    query  = "INSERT INTO %s(%s) VALUES %%s" % (table, cols)
+    cursor = conn.cursor()
+    try:
+        extras.execute_values(cursor, query, tuples)
+        conn.commit()
+    except (Exception, ps.DatabaseError) as error:
+        print("Error: %s" % error)
+        conn.rollback()
+        cursor.close()
+        return 1
+    print("execute_values() done")
+    cursor.close()
+
+# Executing sql code.
+execute_values(conn, df, "staging_db.google_trend_keyword_staging_db")
+print("Data is inserted in staging_db.google_trend_keyword_staging_db.")
+
+# Closing the connection with Postgres.
+conn.close()
+print('Disconneted!')

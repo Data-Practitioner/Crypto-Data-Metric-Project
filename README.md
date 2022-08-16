@@ -351,13 +351,41 @@ All the data is imported via a trigger from the database except All Stats Fact. 
 
 ![image](https://user-images.githubusercontent.com/99619460/184975860-d7c4cb2c-1734-42cb-a6c3-be73a5d077b0.png)
 
-![image](https://user-images.githubusercontent.com/99619460/184975796-280ab8aa-a3cb-4843-a70a-3f65964e4c60.png)
+![image](https://user-images.githubusercontent.com/99619460/184975796-280ab8aa-a3cb-4843-a70a-3f65964e4c60.png
+
+#### 2.3.2. Logical Model
+
+##### 2.3.2.1. ERD
+
+![image](https://user-images.githubusercontent.com/99619460/184976266-d6cd0012-98bd-4a9c-9bdd-c484c2eeca3a.png)
+
+##### 2.3.2.2. Incremental ETL
+All the data is incrementally loaded from the database to the data warehouse. This ensures to retain all the historical records and only process data that needs to process.
+
+##### 2.3.2.3. Keys (Primary & Secondary)
+All the tables have the primary and secondary key, so data can be indexed faster, assist with joins, and ensures consistency.
+
+##### 2.3.2.4. Relationship
+All the relationships between tables are defined to develop table structures and prevent redundant data.
+
+##### 2.3.2.5. Transactional Data Timestamp
+Each table has an Extraction Timestamp column, providing a log of each record when the data was extracted, transformed, and stored in the database.
+
+##### 2.3.2.6. Schema
+The Data warehouse is designed as a star schema with one dimension table and other fact tables.
+
+#### 2.3.3. Physical Model
+##### 2.3.3.1 ERD
+Based on the physical model of below ERD relationships, keys, timestamps, and star schema are defined. All the data is moved from the database to the warehouse via the Postgres Trigger function.
+
+![image](https://user-images.githubusercontent.com/99619460/184976578-65b7e129-d6e0-499d-83c8-b5ee57ede204.png)
+
+##### 2.3.3.2. All Stats Fact Table
+The Python framework moves all the data from the database to the data warehouse.
+
+Python Script - https://github.com/Data-Practitioner/Crypto-Data-Metric/blob/main/data_engineering_pipeline/all_stats_fact_table
+
+Data Orchestration - Windows Task scheduler is running Python script at set intervals throughout the day.
 
 
 
-
-
-
-
-
-###### 

@@ -176,3 +176,35 @@ This script extracts Bitcoin’s performance data compared to altcoins from Bloc
 Python Script - https://github.com/Data-Practitioner/Crypto-Data-Metric/blob/main/data_engineering_pipeline/altcoin_index_stats
 
 Data Orchestration - Windows Task scheduler is running Python script at set intervals throughout the day.
+
+##### 2.1.1.2.2. Bitcoin & Ethereum Social Stats
+
+This script extracts Bitcoin and Ethereum’s social data from Bitinfocharts.com via web scraping. Python transforms that data and loads it into the Postgres database.
+
+Python Script - https://github.com/Data-Practitioner/Crypto-Data-Metric/blob/main/data_engineering_pipeline/bitcoin_%26_ethereum_social_stats
+
+Data Orchestration - Windows Task scheduler is running Python script at set intervals throughout the day.
+
+##### 2.1.1.2.3. Bitcoin Network Stats
+
+This script extracts Bitcoin on-chain analytics data from Coin.dance via web scraping. Python transforms that data and loads it into the Postgres database.
+
+Python Script - https://github.com/Data-Practitioner/Crypto-Data-Metric/blob/main/data_engineering_pipeline/bitcoin_network_stats
+
+Data Orchestration - Windows Task scheduler is running Python script at set intervals throughout the day.
+
+##### 2.1.1.2.4. Bitcoin Network Stats
+
+This script extracts Bitcoin historical price data from Coin.dance via web scraping. Python transforms that data and loads it into the Postgres database.
+
+Python Script - https://github.com/Data-Practitioner/Crypto-Data-Metric/blob/main/data_engineering_pipeline/bitcoin_historical_prices
+
+Data Orchestration - Windows Task scheduler is running Python script at set intervals throughout the day.
+
+##### 2.1.1.2.5. Institutional Holdings
+
+This script extracts Bitcoin & Ethereum’s institutional data from Tokenview.com via web scraping. Python transforms that data and loads it into the Postgres database.
+
+Python Script - https://github.com/Data-Practitioner/Crypto-Data-Metric/blob/main/data_engineering_pipeline/institutional_holdings
+
+Data Orchestration - Windows Task scheduler is running Python script at set intervals throughout the day.

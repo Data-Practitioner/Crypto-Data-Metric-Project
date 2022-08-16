@@ -42,3 +42,28 @@ To bring Crypto Data Metric’s vision to life, the below steps are required.
 5. Display all the information in a dashboard as a web application with a domain link to Cryptodatametic.com.
 
 6. Each step of the process should be automated.
+
+### 1.3. Tools
+
+Data Extraction - Python (Beautiful Soup, Request, Selenium, Pytrends, Praw, and Tweepy)
+
+Data Storage <br>
+1. Python - Psycopg and SQL Alchemy <br>
+2. Postgres <br>
+
+Data Orchestration - Windows Task Scheduler
+
+Data Mining, Analysis, and Transformation - Python (Pandas, Numpy, Unicode Data, and Contractions)
+
+Time Series Analysis, Text Mining, and NLP - Python (Sklearn, Feauture Engine, NLTK, Text Blob, Statsmodels, and Pmdarima)
+
+Data Visualization <br>
+1. Python - Matplotlib and Seaborn <br>
+2. Power BI <br>
+
+Web Application - Python (Streamlit)
+
+Model Deployment <br> 
+1. Docker <br>
+2. AWS <br>
+

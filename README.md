@@ -402,5 +402,31 @@ Flowchart
 
 ![image](https://user-images.githubusercontent.com/99619460/184977648-5df2d662-e846-49aa-83b1-0fe98fc50264.png)
 
-Python Script - 
+Python Script - https://github.com/Data-Practitioner/Crypto-Data-Metric/blob/main/data_science_ml_pipeline/test_environment.ipynb
+
+#### 3.1.2. Production Environment
+
+The Data is extracted from the data warehouse and used in the time series pipeline to predict future Bitcoin and Ethereum prices. Predicted values are stored in the data warehouse for visualization. The below process reflects how the time series model was implemented in a production environment.
+
+Flowchart
+
+![image](https://user-images.githubusercontent.com/99619460/184982776-bc7c0483-31bf-4080-836e-18b2523b5dfb.png)
+
+Python Script - https://github.com/Data-Practitioner/Crypto-Data-Metric/blob/main/data_science_ml_pipeline/production_environment
+
+### 3.2. NLP Pipeline
+#### 3.2.1. Flowchart
+
+![image](https://user-images.githubusercontent.com/99619460/184982950-84a6d4fa-9066-4332-9e32-66eb90e11443.png)
+
+### 3.2.2. Scripts
+
+Reddit Comments - https://github.com/Data-Practitioner/Crypto-Data-Metric/blob/main/data_science_ml_pipeline/reddit_comments
+
+Twitter User Tweets - https://github.com/Data-Practitioner/Crypto-Data-Metric/blob/main/data_science_ml_pipeline/twitter_user_tweets
+
+Crypto News - https://github.com/Data-Practitioner/Crypto-Data-Metric/blob/main/data_science_ml_pipeline/crypto_news
+
+All the scripts runs automatically at set intervals throughout the day via Windows Task Scheduler.
+
 

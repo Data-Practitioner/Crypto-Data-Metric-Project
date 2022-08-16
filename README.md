@@ -208,3 +208,52 @@ This script extracts Bitcoin & Ethereum’s institutional data from Tokenview.co
 Python Script - https://github.com/Data-Practitioner/Crypto-Data-Metric/blob/main/data_engineering_pipeline/institutional_holdings
 
 Data Orchestration - Windows Task scheduler is running Python script at set intervals throughout the day.
+
+#### 2.1.2. Unstructured Data
+All unstructured data is extracted via API.
+
+Below is the flowchart of the process.
+
+![image](https://user-images.githubusercontent.com/99619460/184971793-d82c90cc-7a13-475f-b7df-69740541b64c.png)
+
+##### 2.1.2.1. API
+
+Data is extracted via API, transformed using Python, and loaded into Postgres Database. All the Python scripts are automatically running at set intervals using the windows task scheduler.
+
+Below is a flowchart of the process.
+
+![image](https://user-images.githubusercontent.com/99619460/184971860-2ceaf62b-2cf9-4e54-b5d9-3b1ef8e50669.png)
+
+Six different Python scripts are running to extract data via API. Below is the list of files. <br>
+Ø Reddit Post  <br>
+Ø Reddit Comments <br>
+Ø Google Trend <br>
+Ø Crypto News <br>
+Ø Twitter Keyword <br>
+Ø Twitter User <br>
+
+The below section explains each Python script and code linked to the script.
+
+###### 2.1.2.1.1. Reddit Post
+
+This script is extracting Reddit posts from Reddit.com via API. Python transforms that data and loads it into the Postgres database.
+
+Python Script - https://github.com/Data-Practitioner/Crypto-Data-Metric/blob/main/data_engineering_pipeline/reddit_post
+
+Data Orchestration - Windows Task scheduler is running Python script at set intervals throughout the day.
+
+###### 2.1.2.1.2. Reddit Comments
+
+This script is extracting Reddit comments from Reddit.com via API. Python transforms that data and loads it into the Postgres database.
+
+Python Script - https://github.com/Data-Practitioner/Crypto-Data-Metric/blob/main/data_engineering_pipeline/reddit_comments
+
+Data Orchestration - Windows Task scheduler is running Python script at set intervals throughout the day.
+
+###### 2.1.2.1.3. Google Trend
+
+This script extracts the Google Trend score from Trends.google.com via API. Python transforms that data and loads it into the Postgres database.
+
+Python Script - https://github.com/Data-Practitioner/Crypto-Data-Metric/blob/main/data_engineering_pipeline/google_trend
+
+Data Orchestration - Windows Task scheduler is running Python script at set intervals throughout the day.

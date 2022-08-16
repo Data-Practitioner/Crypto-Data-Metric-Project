@@ -1,0 +1,20 @@
+# Install python version.
+FROM python:3.9
+
+# Expose port 8501 to run streamlit app.
+EXPOSE 8501
+
+# Set-up working directory.
+WORKDIR /app
+
+# Copy packages from local requirements file to Docker image requirement file.
+COPY requirements.txt ./requirements.txt
+
+# Install streamlit.
+RUN pip install streamlit
+
+# Copy all files from local project to Docker image.
+COPY . .
+
+# Lastly we specified the entry command this line is simply running python ./main.py in our container terminal.
+CMD streamlit run app.py

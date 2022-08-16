@@ -257,3 +257,26 @@ This script extracts the Google Trend score from Trends.google.com via API. Pyth
 Python Script - https://github.com/Data-Practitioner/Crypto-Data-Metric/blob/main/data_engineering_pipeline/google_trend
 
 Data Orchestration - Windows Task scheduler is running Python script at set intervals throughout the day.
+
+###### 2.1.2.1.4. Crypto News
+
+This script extracts Crypto news from Crypto.com via API. Python transforms that data and loads it into the Postgres database.
+
+Python Script - https://github.com/Data-Practitioner/Crypto-Data-Metric/blob/main/data_engineering_pipeline/crypto_news
+
+Data Orchestration - Windows Task scheduler is running Python script at set intervals throughout the day.
+
+###### 2.1.2.1.5. Twitter Keyword
+This script extracts Tweets based on keywords from Twitter.com via API. Python transforms that data and loads it into the Postgres database.
+
+Python Script - https://github.com/Data-Practitioner/Crypto-Data-Metric/blob/main/data_engineering_pipeline/twitter_keyword
+
+Data Orchestration - Windows Task scheduler is running Python script at set intervals throughout the day.
+
+###### 2.1.2.1.6. Twitter User
+This script extracts Tweets based on real-time user data from Twitter.com via API. Python transforms that data and loads it into the Postgres database.
+
+Python Script - https://github.com/Data-Practitioner/Crypto-Data-Metric/blob/main/data_engineering_pipeline/twitter_user
+
+Data Orchestration - Windows Task scheduler is running Python script at set intervals throughout the day.
+

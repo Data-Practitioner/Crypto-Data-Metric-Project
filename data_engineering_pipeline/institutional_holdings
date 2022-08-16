@@ -1,0 +1,66 @@
+# Import all the libraries
+from selenium import webdriver
+from selenium.webdriver.common.by import By
+from selenium.webdriver.chrome.service import Service
+import pandas as pd
+import sqlalchemy as sql
+import time
+
+# Website to extract.
+website = 'https://tokenview.com/en/Grayscale'
+
+# Executing selenium to launch chrome browser.
+path = Service(r'C:\Program Files\Google\Chrome\chromedriver_win32\chromedriver.exe')
+
+# Lanching chrome driver.
+driver = webdriver.Chrome(service=path)
+
+# Loading website.
+driver.get(website)
+
+# Wait for the page to load
+time.sleep(20)
+
+# Extracting the data in table format.
+header = ['symbol', 'total_holdings', 'total_holdings_usd', 'holdings_per_share', 'market_price_per_share',
+          'premium_rate', 'close_time', '24_hour_change', '7_day_change','30_day_change']
+row1 = driver.find_element(By.XPATH, '//div[@class="mycard-content"]/div[2]').text.strip().split('\n')
+row2 = driver.find_element(By.XPATH, '//div[@class="mycard-content"]/div[3]').text.strip().split('\n')
+row3 = driver.find_element(By.XPATH, '//div[@class="mycard-content"]/div[4]').text.strip().split('\n')
+row4 = driver.find_element(By.XPATH, '//div[@class="mycard-content"]/div[5]').text.strip().split('\n')
+row5 = driver.find_element(By.XPATH, '//div[@class="mycard-content"]/div[6]').text.strip().split('\n')
+row6 = driver.find_element(By.XPATH, '//div[@class="mycard-content"]/div[7]').text.strip().split('\n')
+row7 = driver.find_element(By.XPATH, '//div[@class="mycard-content"]/div[8]').text.strip().split('\n')
+row8 = driver.find_element(By.XPATH, '//div[@class="mycard-content"]/div[9]').text.strip().split('\n')
+row9 = driver.find_element(By.XPATH, '//div[@class="mycard-content"]/div[10]').text.strip().split('\n')
+row10 = driver.find_element(By.XPATH, '//div[@class="mycard-content"]/div[11]').text.strip().split('\n')
+row11 = driver.find_element(By.XPATH, '//div[@class="mycard-content"]/div[12]').text.strip().split('\n')
+row12 = driver.find_element(By.XPATH, '//div[@class="mycard-content"]/div[13]').text.strip().split('\n')
+row13 = driver.find_element(By.XPATH, '//div[@class="mycard-content"]/div[14]').text.strip().split('\n')
+row14 = driver.find_element(By.XPATH, '//div[@class="mycard-content"]/div[15]').text.strip().split('\n')
+
+# Converting data to store all the scraped data.
+df = pd.DataFrame([header, row1, row2, row3, row4, row5, row6, row7, row8, row9, row10, row11, row12, row13, row14])
+
+# Removing top row.
+df.columns = df.iloc[0]
+df = df[1:]
+
+# Adding data extraction timestamp.
+df.insert(0, 'crypto_id', [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14])
+df.insert(11, 'extraction_timestamp', pd.to_datetime('now').replace(microsecond=0))
+
+# Close the chrome browser
+driver.quit()
+
+# Connect to Postgres DB.
+engine = sql.create_engine("postgresql://postgres:----@localhost/CryptoMetric")
+conn = engine.connect()
+print('Conneted!')
+
+# Load data from DF to DB.
+df.to_sql("institution_holdings",con=conn, if_exists='append', index=False)
+print("Records are added in DB")
+
+# Close the connection to Postgres DB.
+conn.close()

@@ -1,0 +1,227 @@
+# Import library.
+import psycopg2 as ps
+
+# Connecting to Postgres DB.
+conn = ps.connect(host="localhost",
+                  dbname="CryptoMetric",
+                  port=---,
+                  user="----",
+                  password="----")
+
+print('Conneted!')
+
+# SQL command to get all the rows in DB.
+command = ("""
+--- 1st CTE data from institution_holdings.
+WITH cte_ins_holdings AS(
+	SELECT institution_holdings_staging_db.crypto_id AS institution_crypto_id,
+		   institution_holdings_staging_db.symbol AS institution_symbol,
+		   institution_holdings_staging_db.total_holdings AS institution_total_holdings,
+		   institution_holdings_staging_db.total_holdings_usd AS institution_total_holdings_usd,
+		   institution_holdings_staging_db.holdings_per_share AS institution_holdings_per_share,
+		   institution_holdings_staging_db.market_price_per_share AS institution_market_price_per_share,
+		   institution_holdings_staging_db.premium_rate AS institution_premium_rate,
+		   institution_holdings_staging_db.close_time AS institution_close_time,
+		   institution_holdings_staging_db."24_hour_change" AS institution_24_hour_change,
+		   institution_holdings_staging_db."7_day_change" AS institution_7_day_change,
+		   institution_holdings_staging_db."30_day_change" AS institution_30_day_change
+	FROM staging_db.institution_holdings_staging_db
+	ORDER BY institution_close_time DESC
+	LIMIT 14
+	),
+
+--- 2nd CTE Union from btc & eth onchain analytics.
+	-- CTE from btc_onchain_analytics.
+    cte_btc_onchain AS(
+	SELECT crypto_id,
+		   total_address,
+		   new_address,
+		   active_address,
+		   etf_flows,
+		   transaction_count,
+		   transfers_volume_sum,
+		   stock_to_flow_ratio,
+	       date
+	FROM staging_db.btc_onchain_analytics_staging_db
+	ORDER BY "date" DESC
+	LIMIT 1
+	),
+	-- CTE from eth_onchain_analytics.
+    cte_eth_onchain AS(
+	SELECT crypto_id,
+		   total_address,
+		   new_address,
+		   0 AS etf_flows,
+		   active_address,
+		   transaction_count,
+		   transfers_volume_sum,
+		   0 AS stock_to_flow_ratio,
+		   date
+	FROM staging_db.eth_onchain_analytics_staging_db
+	ORDER BY "date" DESC
+	LIMIT 1
+	),
+	-- CTE Union from btc & eth onchain analytics.
+  	union_cte_onchain AS(
+	SELECT * FROM cte_btc_onchain
+	UNION
+	SELECT * FROM cte_eth_onchain
+	),
+
+--- 3rd CTE Union from btc & eth social stats.
+	-- CTE from btc_social_stats.
+	cte_btc_social AS(
+	SELECT crypto_id,
+		   bitcoin_reddit_subscribers AS reddit_subscribers,
+		   bitcoin_tweets_count AS tweets_count,
+		   updated_timestamp,
+	       extraction_timestamp
+	FROM staging_db.bitcoin_social_stats_staging_db
+	ORDER BY updated_timestamp DESC
+	LIMIT 1
+	),
+	-- CTE from eth_social_stats.
+	cte_eth_social AS(
+	SELECT crypto_id,
+		   etherium_reddit_subscribers AS reddit_subscribers,
+		   etherium_tweets_count AS tweets_count,
+		   updated_timestamp,
+	       extraction_timestamp
+	FROM staging_db.etherium_social_stats_staging_db
+	ORDER BY updated_timestamp DESC
+	LIMIT 1
+	),
+	-- CTE Union from btc & eth social stats.
+  	union_cte_social AS(
+	SELECT * FROM cte_btc_social
+	UNION
+	SELECT * FROM cte_eth_social
+	),
+
+--- 4th CTE crypto general stats.
+    crypto_general_stats AS(
+	SELECT crypto_general_stats_staging_db.rank AS crypto_rank,
+	       crypto_general_stats_staging_db.name AS crypto_name,
+	       crypto_general_stats_staging_db.symbol AS crypto_symbol,
+	       crypto_general_stats_staging_db.circulating_supply AS crypto_circulating_supply,
+	       crypto_general_stats_staging_db.total_supply AS crypto_total_supply,
+	       crypto_general_stats_staging_db.max_supply AS crypto_max_supply,
+		   crypto_general_stats_staging_db.price AS crypto_price,
+	       crypto_general_stats_staging_db.volume_24h AS crypto_volume_24h,
+		   crypto_general_stats_staging_db.volume_change_24h AS crypto_volume_change_24h,
+		   crypto_general_stats_staging_db.percent_change_1h AS crypto_percent_change_1h,
+		   crypto_general_stats_staging_db.percent_change_24h AS crypto_percent_change_24h,
+		   crypto_general_stats_staging_db.percent_change_7d AS crypto_percent_change_7d,
+		   crypto_general_stats_staging_db.market_cap AS crypto_market_cap,
+		   crypto_general_stats_staging_db.market_cap_dominance AS crypto_market_cap_dominance,
+		   crypto_general_stats_staging_db.last_updated AS crypto_last_updated
+	FROM staging_db.crypto_general_stats_staging_db
+	ORDER BY crypto_general_stats_id DESC
+	LIMIT 200
+    ),
+
+--- 5th CTE - Joining 1, 2, 3 and 4 CTE to create fact table.
+	join_institution_onchain_social_general_fact_tbl AS(
+	SELECT cte_ins_holdings.institution_crypto_id,
+		   cte_ins_holdings.institution_symbol,
+           cte_ins_holdings.institution_total_holdings,
+           cte_ins_holdings.institution_total_holdings_usd,
+           cte_ins_holdings.institution_holdings_per_share,
+           cte_ins_holdings.institution_market_price_per_share,
+           cte_ins_holdings.institution_premium_rate,
+           cte_ins_holdings.institution_close_time,
+           cte_ins_holdings.institution_24_hour_change,
+           cte_ins_holdings.institution_7_day_change,
+           cte_ins_holdings.institution_30_day_change,
+           union_cte_onchain.total_address AS onchain_total_address,
+           union_cte_onchain.new_address AS onchain_new_address,
+           union_cte_onchain.active_address AS onchain_active_address,
+           union_cte_onchain.etf_flows AS onchain_etf_flows,
+           union_cte_onchain.transaction_count AS onchain_transaction_count,
+           union_cte_onchain.transfers_volume_sum AS onchain_transfers_volume_sum,
+           union_cte_onchain.stock_to_flow_ratio AS onchain_stock_to_flow_ratio,
+           union_cte_onchain.date AS onchain_date,
+           union_cte_social.reddit_subscribers AS social_reddit_subscribers,
+           union_cte_social.tweets_count AS social_tweets_count,
+           union_cte_social.updated_timestamp AS social_updated_timestamp,
+           union_cte_social.extraction_timestamp AS social_extraction_timestamp,
+           crypto_general_stats.crypto_rank,
+           crypto_general_stats.crypto_name,
+           crypto_general_stats.crypto_symbol,
+           crypto_general_stats.crypto_circulating_supply,
+           crypto_general_stats.crypto_total_supply,
+           crypto_general_stats.crypto_max_supply,
+           crypto_general_stats.crypto_price,
+           crypto_general_stats.crypto_volume_24h,
+           crypto_general_stats.crypto_volume_change_24h,
+           crypto_general_stats.crypto_percent_change_1h,
+           crypto_general_stats.crypto_percent_change_24h,
+           crypto_general_stats.crypto_percent_change_7d,
+           crypto_general_stats.crypto_market_cap,
+           crypto_general_stats.crypto_market_cap_dominance,
+           crypto_general_stats.crypto_last_updated
+	FROM cte_ins_holdings
+	LEFT JOIN union_cte_onchain ON cte_ins_holdings.institution_crypto_id = union_cte_onchain.crypto_id
+	LEFT JOIN union_cte_social ON cte_ins_holdings.institution_crypto_id = union_cte_social.crypto_id
+	LEFT JOIN crypto_general_stats ON cte_ins_holdings.institution_symbol = crypto_general_stats.crypto_symbol
+    )
+
+--- Insert data into the fact table.
+INSERT INTO staging_db.crypto_all_stats_fact(
+	               			   institution_crypto_id,
+							   institution_symbol,
+							   institution_total_holdings,
+							   institution_total_holdings_usd,
+							   institution_holdings_per_share,
+							   institution_market_price_per_share,
+							   institution_premium_rate,
+							   institution_close_time,
+							   institution_24_hour_change,
+							   institution_7_day_change,
+							   institution_30_day_change,
+						       onchain_total_address,
+							   onchain_new_address,
+							   onchain_active_address,
+							   onchain_etf_flows,
+						       onchain_transaction_count,
+					       	   onchain_transfers_volume_sum,
+							   onchain_stock_to_flow_ratio,
+							   onchain_date,
+							   social_reddit_subscribers,
+							   social_tweets_count,
+							   social_updated_timestamp,
+							   social_extraction_timestamp,
+							   crypto_rank,
+							   crypto_name,
+	               		   crypto_symbol,
+							   crypto_circulating_supply,
+							   crypto_total_supply,
+							   crypto_max_supply,
+							   crypto_price,
+							   crypto_volume_24h,
+							   crypto_volume_change_24h,
+							   crypto_percent_change_1h,
+							   crypto_percent_change_24h,
+							   crypto_percent_change_7d,
+							   crypto_market_cap,
+							   crypto_market_cap_dominance,
+							   crypto_last_updated
+							  )
+(SELECT *
+FROM join_institution_onchain_social_general_fact_tbl);
+
+""")
+
+# New cursor to run SQL.
+curr = conn.cursor()
+
+# Execute SQL command.
+curr.execute(command)
+print("Data is inserted in staging_db.crypto_all_stats_fact table.")
+
+# Apply changes to the database.
+conn.commit()
+
+# Closing the connection with Postgres.
+curr.close()
+conn.close()

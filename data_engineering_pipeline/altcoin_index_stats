@@ -1,0 +1,61 @@
+# Import all the libraries.
+from bs4 import BeautifulSoup
+import requests
+import pandas as pd
+import sqlalchemy as sql
+
+# Get HTML content.
+website = 'https://www.blockchaincenter.net/altcoin-season-index/'
+result = requests.get(website)
+content = result.text
+soup = BeautifulSoup(content, 'html.parser')
+
+# Restructure HTML code.
+soup.prettify()
+
+# Locate altcoin index by month value.
+altcoin_index_month_title = "Altcoin Month Index"
+altcoin_index_month_value = int(soup.find_all('b')[1].text[1:-1])
+
+if altcoin_index_month_value > 75:
+    altcoin_index_month_status =  "It's Altcoin Season: 75% of the top 50 coins performed better than Bitcoin over the last month (30 days)"
+else:
+    altcoin_index_month_status =  "It's Bitcoin Season: 75% of the top 50 coins performed worst than Bitcoin over the last month (30 days)."
+
+
+# Locate altcoin index by quarter value.
+altcoin_index_quarter_title = "Altcoin Quarter Index"
+altcoin_index_quarter_value = int(soup.find_all('b')[0].text[1:-1])
+
+if altcoin_index_quarter_value > 75:
+    altcoin_index_quarter_status =  "It's Altcoin Season: 75% of the top 50 coins performed better than Bitcoin over the last quarter (90 days)."
+else:
+    altcoin_index_quarter_status =  "It's Bitcoin Season: 75% of the top 50 coins performed worst than Bitcoin over the last quarter (90 days)."
+
+# Locate altcoin index by year value.
+altcoin_index_year_title = "Altcoin Year Index"
+altcoin_index_year_value = int(soup.find_all('b')[2].text[1:-1])
+
+if altcoin_index_year_value > 75:
+    altcoin_index_year_status =  "It's Altcoin Season: 75% of the top 50 coins performed better than Bitcoin over the last year (360 days)."
+else:
+    altcoin_index_year_status =  "It's Bitcoin Season: 75% of the rop 50 coins performed worst than Bitcoin over the last year (360 days)."
+
+# Converting the data into dataframe.
+df_altcoin_index = pd.DataFrame({'crypto_id': 1,
+                                 'metric':[altcoin_index_month_title, altcoin_index_quarter_title, altcoin_index_year_title],
+                                 'value': [altcoin_index_month_value, altcoin_index_quarter_value, altcoin_index_year_value],
+                                 'status': [altcoin_index_month_status, altcoin_index_quarter_status, altcoin_index_year_status],
+                                 'extraction_timestamp': pd.to_datetime('now').replace(microsecond=0)})
+
+# Connect to Postgres DB.
+engine = sql.create_engine("postgresql://postgres:----@localhost/CryptoMetric")
+conn = engine.connect()
+print('Conneted!')
+
+# Load data from DF to DB table. Append was impletmented so primary key is preserved.
+df_altcoin_index.to_sql("altcoin_index",con=conn, if_exists='append', index = False)
+print("Records are added in DB")
+
+# Close the connection to Postgres DB.
+conn.close()

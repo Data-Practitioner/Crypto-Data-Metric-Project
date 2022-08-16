@@ -67,3 +67,19 @@ Model Deployment <br>
 • Docker <br>
 • AWS <br>
 
+### 1.4. Technical Skills
+Data Analysis <br>
+Data Mining <br>
+Data Orchestration <br>
+Data Visualization <br>
+Data Transformation <br>
+ML Deployment <br>
+Web Application <br>
+Data Storytelling <br>
+NLP & Text Mining <br>
+Time Series Forecasting <br>
+ETL <br>
+Database Design <br>
+Data Warehouse Design <br>
+Web Scraping <br>
+Programming (SQL and Python) <br>

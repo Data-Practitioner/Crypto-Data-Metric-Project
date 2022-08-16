@@ -598,5 +598,5 @@ Also, different layers of analytics for Ethereum are captured in this single das
 
 ![image](https://user-images.githubusercontent.com/99619460/184986749-099d96a8-3fa9-458d-a3ae-c955c5130231.png)
 
-# Disclaimer
+## Disclaimer
 Crypto Data Metric is a fictional company; it was used to showcase a real-world project from a real company’s perspective. 

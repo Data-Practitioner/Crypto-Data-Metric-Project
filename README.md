@@ -310,4 +310,54 @@ All the relationships between tables are defined to build structures and prevent
 ###### 2.2.1.2.5. Transactional Data Timestamp
 Each table has an Extraction Timestamp column, providing a log of each record when the data was extracted, transformed, and stored in the database.
 
-######
+##### 2.2.1.3. Physical Model
+###### 2.2.1.3.1. ERD
+Based on the physical model of below ERD relationships, keys and timestamps are defined.
+
+![image](https://user-images.githubusercontent.com/99619460/184974605-aca58636-3fca-441b-b41f-4724a1cc4e40.png)
+
+#### 2.2.2. Unstructured Data
+
+##### 2.2.2.1. Table & Flowchart
+Data is extracted via API, transformed, and loaded into the below tables in Postgres Database
+
+![image](https://user-images.githubusercontent.com/99619460/184974815-aa6593fc-367b-4e69-8dbd-564c63c1a52c.png)
+
+![image](https://user-images.githubusercontent.com/99619460/184974759-512d947b-1f34-4022-94f3-0709cd617f5f.png)
+
+##### 2.2.2.2. Logical Model
+
+###### 2.2.2.2.1. ERD
+
+![image](https://user-images.githubusercontent.com/99619460/184975033-6e53d608-849d-4475-bfc6-456ae6340038.png)
+
+###### 2.2.2.2.2. Keys (Primary & Secondary)
+All the tables have the primary key so data can be indexed faster and ensures consistency.
+
+###### 2.2.2.2.3. Transactional Data Timestamp
+Each table has an Extraction Timestamp column, providing a log of each record when the data was extracted, transformed, and stored in the database.
+
+##### 2.2.2.3. Physical Model 
+
+###### 2.2.2.3.1. ERD
+Based on the physical model of below ERD relationships, keys and timestamps are defined.
+
+![image](https://user-images.githubusercontent.com/99619460/184975496-005c864f-a6ba-4d6c-a700-e8fd2c0d9acf.png)
+
+### 2.3. Data Warehouse Design
+
+#### 2.3.1. Table & Flowchart
+All the data is imported via a trigger from the database except All Stats Fact. All Stats Fact table is imported from the database via Python framework.
+
+![image](https://user-images.githubusercontent.com/99619460/184975860-d7c4cb2c-1734-42cb-a6c3-be73a5d077b0.png)
+
+![image](https://user-images.githubusercontent.com/99619460/184975796-280ab8aa-a3cb-4843-a70a-3f65964e4c60.png)
+
+
+
+
+
+
+
+
+###### 

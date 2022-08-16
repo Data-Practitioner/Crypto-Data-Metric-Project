@@ -1,0 +1,59 @@
+# Import all the libraries
+from selenium import webdriver
+from selenium.webdriver.common.by import By
+from selenium.webdriver.chrome.service import Service
+import pandas as pd
+import sqlalchemy as sql
+import time
+
+# Website to extract.
+website = 'https://coin.dance/stats'
+
+# Executing selenium to launch chrome browser.
+path = Service(r'C:\Program Files\Google\Chrome\chromedriver_win32\chromedriver.exe')
+
+# Lanching chrome driver.
+driver = webdriver.Chrome(service=path)
+
+# Loading website.
+driver.get(website)
+
+# Wait for the page to load
+time.sleep(10)
+
+# Locating row where CSS element will be used for looping.
+rows = driver.find_elements(By.CSS_SELECTOR,('tr'))
+
+# Variable to store values that is generated through loops.
+period = []
+dollar_change = []
+percentage_change = []
+percentage_arrow_change = []
+
+# Looping through each row to get the cell value. All the cell values are stored as a list.
+for row in rows[1:14]:
+    period.append(row.find_element(By.CSS_SELECTOR,('td:first-of-type')).text)
+    dollar_change.append(row.find_element(By.CSS_SELECTOR,('td:nth-of-type(2)')).text)
+    percentage_change.append(row.find_element(By.CSS_SELECTOR,('td:nth-of-type(3)')).text)
+    percentage_arrow_change.append(row.find_element(By.CSS_SELECTOR,('td:nth-of-type(4)')).text)
+
+# Creating a Dataframe to store all the scraped data.
+df = pd.DataFrame({'crypto_id': 1, 'period': period, 'dollar_change': dollar_change,
+                   'percentage_change': percentage_change,
+                   'percentage_arrow_change':percentage_arrow_change,
+                   'extraction_timestamp': pd.to_datetime('now').replace(microsecond=0)})
+
+# Close the chrome browser
+driver.quit()
+
+# Connect to Postgres DB.
+engine = sql.create_engine("postgresql://postgres:----@localhost/CryptoMetric")
+conn = engine.connect()
+print('Conneted!')
+
+# Load data from DF to DB.
+df.to_sql("bitcoin_price_stats",con=conn, if_exists='append', index= False)
+print("Records are added in DB")
+
+# Close the connection to Postgres DB.
+conn.close()

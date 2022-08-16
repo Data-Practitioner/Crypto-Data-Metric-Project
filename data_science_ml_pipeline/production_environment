@@ -1,0 +1,149 @@
+# Importing libraries.
+import pandas as pd
+import sqlalchemy as sql
+import re
+import warnings
+import logging
+import psycopg2 as ps
+import psycopg2.extras as extras
+from pmdarima import auto_arima
+from datetime import datetime
+from datetime import timedelta
+from datetime import timezone
+
+warnings.filterwarnings("ignore")
+logging.disable(logging.CRITICAL)
+
+# Connect to Postgres DB.
+engine = sql.create_engine("postgresql://postgres:----@localhost/CryptoMetric")
+conn = engine.connect()
+print('Conneted!')
+
+column_names = ['date_time', 'symbol', 'price']
+
+# Getting data from the database.
+sql_query = """
+SELECT crypto_last_updated,
+       institution_symbol,
+	 crypto_price
+FROM staging_db.crypto_all_stats_fact
+WHERE institution_symbol IN ('BTC', 'ETH')
+ORDER BY crypto_all_stats_id
+"""
+
+# Executing SQL code to get the data and storing in dataframe.
+df = pd.DataFrame(engine.execute(sql_query), columns=column_names)
+
+# Close the connection to Postgres DB.
+conn.close()
+print('Disconneted!')
+
+########## Data Cleaning ##########
+
+# Data cleaning date column.
+df['date_time'] = pd.to_datetime(df['date_time'], errors='coerce', infer_datetime_format=True)
+df.set_index('date_time')
+
+########## Predictive Modeling - Model Building ##########
+
+# Splitting data between BTC & ETH.
+btc_data = pd.DataFrame(data[data['symbol'] == 'BTC'])
+btc_data = btc_data[['date_time', 'price']]
+btc_data = btc_data[btc_data['price'] != 0]
+btc_data.set_index('date_time', inplace=True)
+
+eth_data = data[data['symbol'] == 'ETH']
+eth_data = eth_data[['date_time', 'price']]
+eth_data = eth_data[eth_data['price'] != 0]
+eth_data.set_index('date_time', inplace =True)
+
+hour = timedelta(hours=1)
+current_date = datetime.now().strftime("%d-%m-%Y %H:%M:%S")
+print(current_date)
+date_time = []
+
+def generate_datetimes(date_from_str=current_date):
+   date_from = datetime.strptime(date_from_str, '%d-%m-%Y %H:%M:%S')
+   for hour in range(0, 48):
+       yield date_from + timedelta(hours=hour)
+
+for date in generate_datetimes():
+    date_time.append(date.strftime('%Y-%m-%d %H:%M:%S'))
+
+# Bitcoin Arima Model.
+stepwise_model = auto_arima(btc_data, start_p=1, start_q=1,
+                           max_p=3, max_q=3, m=12,
+                           start_P=0, seasonal=True,
+                           d=1, D=1, trace=True,
+                           error_action='ignore',
+                           suppress_warnings=True,
+                           stepwise=True)
+
+stepwise_model.summary()
+
+# Displaying predicted values.
+pred_btc = pd.DataFrame(stepwise_model.predict(n_periods=48))
+pred_btc.columns = ['predicted_value']
+
+arima_pred_btc = pred_btc
+arima_pred_btc['date_time'] = date_time
+arima_pred_btc = arima_pred_btc[['date_time', 'predicted_value']]
+
+# Ethereum Arima Model.
+stepwise_model = auto_arima(eth_data, start_p=1, start_q=1,
+                           max_p=3, max_q=3, m=12,
+                           start_P=0, seasonal=True,
+                           d=1, D=1, trace=True,
+                           error_action='ignore',
+                           suppress_warnings=True,
+                           stepwise=True)
+
+stepwise_model.summary()
+
+# Displaying predicted values.
+pred_eth = pd.DataFrame(stepwise_model.predict(n_periods=48))
+pred_eth.columns = ['predicted_value']
+
+arima_pred_eth = pred_eth
+arima_pred_eth['date_time'] = date_time
+arima_pred_eth = arima_pred_eth[['date_time', 'predicted_value']]
+
+# Connecting to Postgres DB.
+conn = ps.connect(host="---",
+                  dbname="CryptoMetric",
+                  port=---,
+                  user="---",
+                  password="---")
+
+print('Conneted!')
+
+# Defining sql function.
+def execute_values(conn, df, table):
+    # Create a list of tupples from the dataframe values
+    tuples = [tuple(x) for x in df.to_numpy()]
+    # Comma-separated dataframe columns
+    cols = ','.join(list(df.columns))
+    # SQL quert to execute
+    query  = "INSERT INTO %s(%s) VALUES %%s" % (table, cols)
+    cursor = conn.cursor()
+    try:
+        extras.execute_values(cursor, query, tuples)
+        conn.commit()
+    except (Exception, ps.DatabaseError) as error:
+        print("Error: %s" % error)
+        conn.rollback()
+        cursor.close()
+        return 1
+    print("execute_values() done")
+    cursor.close()
+
+# Executing sql code.
+execute_values(conn, arima_pred_btc, "ml_db.arima_pred_btc_ml_db")
+print("Data is inserted in ml_db.arima_pred_btc_ml_db table.")
+
+execute_values(conn, arima_pred_eth, "ml_db.arima_pred_eth_ml_db")
+print("Data is inserted in ml_db.prophet_pred_eth_ml_db table.")
+
+# Closing the connection with Postgres.
+conn.close()
+print('Disconneted!')

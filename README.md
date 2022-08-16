@@ -31,9 +31,9 @@ To bring Crypto Data Metric’s vision to life, the below steps are required.
 2. Move the data from the database to the data warehouse for machine learning and data analytics.
 
 3. Machine learning <br>
-• Understand public sentiment on Bitcoin and Ethereum (Diagnostic Analytics).
-• Predict Bitcoin and Ethereum’s future prices (Predictive Analytics).
-• Provide buy and sell signal (Prescriptive Analytics).
+• Understand public sentiment on Bitcoin and Ethereum (Diagnostic Analytics). <br>
+• Predict Bitcoin and Ethereum’s future prices (Predictive Analytics). <br>
+• Provide buy and sell signal (Prescriptive Analytics). <br>
 
 4. Data Analytics <br>
 • Bitcoin and Ethereum’s latest prices (Descriptive Analytics). <br>

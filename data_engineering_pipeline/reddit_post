@@ -1,0 +1,54 @@
+# Importing libraries.
+import praw
+import pandas as pd
+import sqlalchemy as sql
+from datetime import datetime
+
+# Authenticating reddit credentials.
+reddit = praw.Reddit(
+    client_id="----",
+    client_secret="----",
+    password="----",
+    user_agent="----",
+    username="----",
+    check_for_async=False
+    )
+
+# List of subreddits.
+subreddit = ("cryptocurrency+cryptocurrencies+bitcoin+satoshistreetbets+cryptomoonshots+cryptomarkets+ethtrader+ethereum")
+
+# List of all the subreddit posts will be saved.
+posts = []
+
+# Top 50 posts daily from the subreddit.
+submission = reddit.subreddit(subreddit).top('day', limit=50)
+
+# Loop through top 50 daily post in the subreddit.
+for post in submission:
+
+    # Storing all the post data.
+    posts.append([post.title, post.score, str(post.subreddit), post.url, post.num_comments, post.selftext, str(post.author), str(datetime.fromtimestamp(post.created))])
+
+# Comverting all the data into dataframe.
+posts = pd.DataFrame(posts,columns=['post_title', 'post_score', 'subreddit', 'post_url', 'num_comments', 'post_body', 'post_author', 'post_created'])
+
+# Post_title is set to index.
+posts = posts.set_index('post_title')
+
+# Adding data extraction timestamp.
+posts.insert(7, 'extraction_timestamp', pd.to_datetime('now').replace(microsecond=0))
+
+# Resetting date as index.
+posts = posts.reset_index()
+
+# Connect to Postgres DB.
+engine = sql.create_engine("postgresql://postgres:----@localhost/CryptoSocial")
+conn = engine.connect()
+print('Conneted!')
+
+# Load data from DF to DB.
+posts.to_sql("top_reddit_posts",con=conn, if_exists='append', index=False)
+print("Records are added in DB")
+
+# Close the connection to Postgres DB.
+conn.close()

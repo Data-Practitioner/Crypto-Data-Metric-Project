@@ -193,7 +193,7 @@ Python Script - https://github.com/Data-Practitioner/Crypto-Data-Metric/blob/mai
 
 Data Orchestration - Windows Task scheduler is running Python script at set intervals throughout the day.
 
-##### 2.1.1.2.4. Bitcoin Network Stats
+##### 2.1.1.2.4. Bitcoin Historical Prices
 
 This script extracts Bitcoin historical price data from Coin.dance via web scraping. Python transforms that data and loads it into the Postgres database.
 

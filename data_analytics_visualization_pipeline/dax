@@ -1,0 +1,336 @@
+T BTC Date
+MAX(Bitcoin_Onchain_Analytics_Stats[Date])
+
+T BTC New Address
+VAR LatestDate = Measure_Bitcoin_Onchain_Analytics_Stats[T BTC Date]
+VAR TNewAddress = CALCULATE(SELECTEDVALUE(Bitcoin_Onchain_Analytics_Stats[New Address]), Bitcoin_Onchain_Analytics_Stats[Date] = LatestDate)
+RETURN TNewAddress
+
+T BTC Active Address
+VAR LatestDate = Measure_Bitcoin_Onchain_Analytics_Stats[T BTC Date]
+VAR T_ActiveAddress = CALCULATE(SELECTEDVALUE(Bitcoin_Onchain_Analytics_Stats[Active Address]), Bitcoin_Onchain_Analytics_Stats[Date] = LatestDate)
+RETURN T_ActiveAddress
+
+T BTC Transaction Count
+VAR LatestDate = Measure_Bitcoin_Onchain_Analytics_Stats[T BTC Date]
+VAR TTransactionCount = CALCULATE(SELECTEDVALUE(Bitcoin_Onchain_Analytics_Stats[Transactions]), Bitcoin_Onchain_Analytics_Stats[Date] = LatestDate)
+RETURN TTransactionCount
+
+T BTC Transfer Volume Sum
+VAR LatestDate = Measure_Bitcoin_Onchain_Analytics_Stats[T BTC Date]
+VAR TTransferVolumeSum = CALCULATE(SELECTEDVALUE(Bitcoin_Onchain_Analytics_Stats[Transfer Volume]), Bitcoin_Onchain_Analytics_Stats[Date] = LatestDate)
+RETURN TTransferVolumeSum
+
+T-1 BTC Date
+CALCULATE(MAX(Bitcoin_Onchain_Analytics_Stats[Date])-1)
+
+T-1 BTC Active Address
+VAR PriorDate = Measure_Bitcoin_Onchain_Analytics_Stats[T-1 BTC Date]
+VAR T_1_ActiveAddress = CALCULATE(SELECTEDVALUE(Bitcoin_Onchain_Analytics_Stats[Active Address]), Bitcoin_Onchain_Analytics_Stats[Date] = PriorDate)
+RETURN T_1_ActiveAddress
+
+T-1 BTC New Address
+VAR PriorDate = Measure_Bitcoin_Onchain_Analytics_Stats[T-1 BTC Date]
+VAR T_1_NewAddress = CALCULATE(SELECTEDVALUE(Bitcoin_Onchain_Analytics_Stats[New Address]), Bitcoin_Onchain_Analytics_Stats[Date] = PriorDate)
+RETURN T_1_NewAddress
+
+T-1 BTC Transaction Count
+VAR PriorDate = Measure_Bitcoin_Onchain_Analytics_Stats[T-1 BTC Date]
+VAR T_1_TransactionCount = CALCULATE(SELECTEDVALUE(Bitcoin_Onchain_Analytics_Stats[Transactions]), Bitcoin_Onchain_Analytics_Stats[Date] = PriorDate)
+RETURN T_1_TransactionCount
+
+T-1 BTC Transfer Volume Sum
+VAR PriorDate = Measure_Bitcoin_Onchain_Analytics_Stats[T-1 BTC Date]
+VAR T_1_TransferVolumeSum = CALCULATE(SELECTEDVALUE(Bitcoin_Onchain_Analytics_Stats[Transfer Volume]), Bitcoin_Onchain_Analytics_Stats[Date] = PriorDate)
+RETURN T_1_TransferVolumeSum
+
+Percent Change BTC Active Address
+DIVIDE(Measure_Bitcoin_Onchain_Analytics_Stats[T BTC Active Address] - Measure_Bitcoin_Onchain_Analytics_Stats[T-1 BTC Active Address], Measure_Bitcoin_Onchain_Analytics_Stats[T-1 BTC Active Address])
+
+Percent Change BTC New Address	DIVIDE(Measure_Bitcoin_Onchain_Analytics_Stats[T BTC New Address] - Measure_Bitcoin_Onchain_Analytics_Stats[T-1 BTC New Address], Measure_Bitcoin_Onchain_Analytics_Stats[T-1 BTC New Address])
+
+Percent Change BTC Transaction Count
+DIVIDE(Measure_Bitcoin_Onchain_Analytics_Stats[T BTC Transaction Count] - Measure_Bitcoin_Onchain_Analytics_Stats[T-1 BTC Transaction Count], Measure_Bitcoin_Onchain_Analytics_Stats[T-1 BTC Transaction Count])
+
+Percent Change BTC Transfer Volume Sum
+DIVIDE(Measure_Bitcoin_Onchain_Analytics_Stats[T BTC Transfer Volume Sum] - Measure_Bitcoin_Onchain_Analytics_Stats[T-1 BTC Transfer Volume Sum], Measure_Bitcoin_Onchain_Analytics_Stats[T-1 BTC Transfer Volume Sum])
+
+KPI BTC Active Address
+ROUNDUP([Percent Change BTC Active Address],4)*100&"%  "&IF([Percent Change BTC Active Address]>0, "⇧",  "⇩") & " From Prior Day"
+
+KPI BTC New Address
+ROUNDUP([Percent Change BTC New Address],4)*100&"%  "&IF([Percent Change BTC New Address]>0, "⇧",  "⇩") & " From Prior Day"
+
+KPI BTC Transactions
+ROUNDUP([Percent Change BTC Transaction Count],4)*100&"%  "&IF([Percent Change BTC Transaction Count]>0, "⇧",  "⇩")  & " From Prior Day"
+
+KPI BTC Transfer Volume
+ROUNDUP([Percent Change BTC Transfer Volume Sum],4)*100&"%  "&IF([Percent Change BTC Transfer Volume Sum]>0, "⇧",  "⇩")  & " From Prior Day"
+
+T Date BTC Social Stats
+MAX(Bitcoin_Social_Stats[Date])
+
+T-1 Date BTC Social Stats
+CALCULATE(MAX(Bitcoin_Social_Stats[Date])-1)
+
+T BTC Tweet Counts
+VAR LatestDate = Measure_Bitcoin_Social_Stats[T Date BTC Social Stats]
+VAR T_BTC_Tweet_Counts = CALCULATE(SELECTEDVALUE(Bitcoin_Social_Stats[BTC Tweets]), Bitcoin_Social_Stats[Date] = LatestDate)
+RETURN T_BTC_Tweet_Counts
+
+T-1 BTC Tweet Counts
+VAR PriorDate = Measure_Bitcoin_Social_Stats[T-1 Date BTC Social Stats]
+VAR T_BTC_Tweet_Counts = CALCULATE(SELECTEDVALUE(Bitcoin_Social_Stats[BTC Tweets]), Bitcoin_Social_Stats[Date] = PriorDate)
+RETURN T_BTC_Tweet_Counts
+
+Percent Change BTC Tweet Counts
+DIVIDE(Measure_Bitcoin_Social_Stats[T BTC Tweet Counts] - Measure_Bitcoin_Social_Stats[T-1 BTC Tweet Counts], Measure_Bitcoin_Social_Stats[T BTC Tweet Counts])
+
+KPI BTC Tweet Counts
+ROUNDUP([Percent Change BTC Tweet Counts],4)*100&"%  "&IF([Percent Change BTC Tweet Counts]>0, "⇧",  "⇩")  & " From Prior Day"
+
+T BTC Date General Stats
+MAX(Bitcoin_General_Stats[Updated_Timestamp])
+
+BTC Market Cap Dominance
+VAR LatestDate = Measure_Bitcoin_General_Stats[T BTC Date General Stats]
+VAR T_BTC_MarketCapDominance = CALCULATE(SELECTEDVALUE(Bitcoin_General_Stats[Market_Cap]), Bitcoin_General_Stats[Updated_Timestamp] = LatestDate)
+RETURN T_BTC_MarketCapDominance
+
+BTC Market Cap %
+VAR LatestDate = Measure_Bitcoin_General_Stats[T BTC Date General Stats]
+VAR T_BTC_MarketCapDominancePect = ROUNDUP(DIVIDE(CALCULATE(SELECTEDVALUE(Bitcoin_General_Stats[Market_Cap_Dominance]), Bitcoin_General_Stats[Updated_Timestamp] = LatestDate),100),4) * 100 & "% Out of Total Crypto Market Cap"
+RETURN T_BTC_MarketCapDominancePect
+
+T BTC Price
+SELECTEDVALUE(Bitcoin_General_Stats[Price])
+
+BTC Price Change % 1H
+VAR LatestDate = Measure_Bitcoin_General_Stats[T BTC Date General Stats]
+VAR T_BTC_PriceChangePect1H = DIVIDE(CALCULATE(SELECTEDVALUE(Bitcoin_General_Stats[Price_Change_%_1H]), Bitcoin_General_Stats[Updated_Timestamp] = LatestDate),100)
+VAR T_BTC_Arrow = IF(T_BTC_PriceChangePect1H > 0, "⇧",  "⇩")
+VAR Concate = ROUNDUP(T_BTC_PriceChangePect1H, 4) * 100 & "% " & T_BTC_Arrow & " From 1H Ago"
+RETURN Concate
+
+BTC Price Change % 24H
+VAR LatestDate = Measure_Bitcoin_General_Stats[T BTC Date General Stats]
+VAR T_BTC_PriceChangePect24H = DIVIDE(CALCULATE(SELECTEDVALUE(Bitcoin_General_Stats[Price_Change_%_24H]), Bitcoin_General_Stats[Updated_Timestamp] = LatestDate),100)
+VAR T_BTC_Arrow = IF(T_BTC_PriceChangePect24H > 0, "⇧",  "⇩")
+VAR Concate = ROUNDUP(T_BTC_PriceChangePect24H, 4) * 100 & "% " & T_BTC_Arrow & " From 24H Ago"
+	RETURN Concate
+
+BTC Price Change % 7D
+VAR LatestDate = Measure_Bitcoin_General_Stats[T BTC Date General Stats]
+VAR T_BTC_PriceChangePect7D = DIVIDE(CALCULATE(SELECTEDVALUE(Bitcoin_General_Stats[Price_Change_7D]), Bitcoin_General_Stats[Updated_Timestamp] = LatestDate),100)
+VAR T_BTC_Arrow = IF(T_BTC_PriceChangePect7D > 0, "⇧",  "⇩")
+VAR Concate = ROUNDUP(T_BTC_PriceChangePect7D, 4) * 100 & "% " & T_BTC_Arrow & " From 7D Ago"
+	RETURN Concate
+
+T BTC Volume
+VAR LatestDate = Measure_Bitcoin_General_Stats[T BTC Date General Stats]
+VAR T_BTC_Volume = CALCULATE(SELECTEDVALUE(Bitcoin_General_Stats[Volume]), Bitcoin_General_Stats[Updated_Timestamp] = LatestDate)
+RETURN T_BTC_Volume
+
+BTC Volume Change % 24H
+VAR LatestDate = Measure_Bitcoin_General_Stats[T BTC Date General Stats]
+VAR T_BTC_VolumeChangePect24H = DIVIDE(CALCULATE(SELECTEDVALUE(Bitcoin_General_Stats[Volume_Change_%_24H]), Bitcoin_General_Stats[Updated_Timestamp] = LatestDate),100)
+VAR T_BTC_Arrow = IF(T_BTC_VolumeChangePect24H > 0, "⇧",  "⇩")
+VAR Concate = ROUNDUP(T_BTC_VolumeChangePect24H, 4) * 100 & "% " & T_BTC_Arrow & " From 24H Ago"
+RETURN Concate
+
+BTC UTC
+"+00:00"
+
+T ETH Date General Stats
+MAX(ETHEREUM_General_Stats[Updated_Timestamp])
+
+T ETH Market Cap %
+VAR LatestDate = Measure_Ethereum_General_Stats[T ETH Date General Stats]
+VAR T_ETH_MarketCapDominancePect = ROUNDUP(DIVIDE(CALCULATE(SELECTEDVALUE(Ethereum_General_Stats[Market_Cap_Dominance]), Ethereum_General_Stats[Updated_Timestamp] = LatestDate),100) ,4) * 100 & "% Out of Total Crypto Market Cap"
+RETURN T_ETH_MarketCapDominancePect
+
+T ETH Market Cap Dominance
+VAR LatestDate = Measure_Ethereum_General_Stats[T ETH Date General Stats]
+VAR T_ETH_MarketCapDominance = CALCULATE(SELECTEDVALUE(Ethereum_General_Stats[Market_Cap]), Ethereum_General_Stats[Updated_Timestamp] = LatestDate)
+RETURN T_ETH_MarketCapDominance
+
+T ETH Price
+VAR LatestDate = Measure_Ethereum_General_Stats[T ETH Date General Stats]
+VAR T_ETH_Price = CALCULATE(SELECTEDVALUE(Ethereum_General_Stats[Price]), Ethereum_General_Stats[Updated_Timestamp] = LatestDate)
+RETURN T_ETH_Price
+
+T ETH Price Change % 1H
+VAR LatestDate = Measure_Ethereum_General_Stats[T ETH Date General Stats]
+VAR T_ETH_PriceChangePect1H = DIVIDE(CALCULATE(SELECTEDVALUE(Ethereum_General_Stats[Price_Change_%_1H]), Ethereum_General_Stats[Updated_Timestamp] = LatestDate),100)
+VAR T_BTC_Arrow = IF(T_ETH_PriceChangePect1H > 0, "⇧",  "⇩")
+VAR Concate = ROUNDUP(T_ETH_PriceChangePect1H, 4) * 100 & "% " & T_BTC_Arrow & " From 1H Ago"
+RETURN Concate
+
+T ETH Price Change % 24H
+VAR LatestDate = Measure_Ethereum_General_Stats[T ETH Date General Stats]
+VAR T_ETH_PriceChangePect24H = DIVIDE(CALCULATE(SELECTEDVALUE(Ethereum_General_Stats[Price_Change_%_24H]), Ethereum_General_Stats[Updated_Timestamp] = LatestDate),100)
+VAR T_BTC_Arrow = IF(T_ETH_PriceChangePect24H > 0, "⇧",  "⇩")
+VAR Concate = ROUNDUP(T_ETH_PriceChangePect24H, 4) * 100 & "% " & T_BTC_Arrow & " From 24H Ago"
+RETURN Concate
+
+T ETH Price Change % 7D
+VAR LatestDate = Measure_Ethereum_General_Stats[T ETH Date General Stats]
+VAR T_ETH_PriceChangePect7D = DIVIDE(CALCULATE(SELECTEDVALUE(Ethereum_General_Stats[Price_Change_7D]),Ethereum_General_Stats[Updated_Timestamp] = LatestDate),100)
+VAR T_BTC_Arrow = IF(T_ETH_PriceChangePect7D > 0, "⇧",  "⇩")
+VAR Concate = ROUNDUP(T_ETH_PriceChangePect7D, 4) * 100 & "% " & T_BTC_Arrow & " From 7D Ago"
+RETURN Concate
+
+T ETH Volume
+VAR LatestDate = Measure_Ethereum_General_Stats[T ETH Date General Stats]
+VAR T_ETH_Volume = CALCULATE(SELECTEDVALUE(Ethereum_General_Stats[Volume]), Ethereum_General_Stats[Updated_Timestamp] = LatestDate)
+RETURN T_ETH_Volume
+
+T ETH Volume Change % 24H
+VAR LatestDate = Measure_Ethereum_General_Stats[T ETH Date General Stats]
+VAR T_ETH_VolumeChangePect24H = DIVIDE(CALCULATE(SELECTEDVALUE(Ethereum_General_Stats[Volume_Change_%_24H]), Ethereum_General_Stats[Updated_Timestamp] = LatestDate),100)
+VAR T_BTC_Arrow = IF(T_ETH_VolumeChangePect24H > 0, "⇧",  "⇩")
+VAR Concate = ROUNDUP(T_ETH_VolumeChangePect24H, 4) * 100 & "% " & T_BTC_Arrow & " From 24H Ago"
+	RETURN Concate
+
+ETH UTC
+"+00:00"
+
+T-1 ETH Date
+CALCULATE(MAX(Ethereum_Onchain_Analytics_Stats[Date])-1)
+
+T-1 ETH Active Address
+VAR PriorDate = Measure_Ethereum_Onchain_Analytics_Stats[T-1 ETH Date]
+VAR T_1_ActiveAddress = CALCULATE(SELECTEDVALUE(Ethereum_Onchain_Analytics_Stats[Active Address]), Ethereum_Onchain_Analytics_Stats[Date] = PriorDate)
+RETURN T_1_ActiveAddress
+
+T-1 ETH New Address
+VAR PriorDate = Measure_Ethereum_Onchain_Analytics_Stats[T-1 ETH Date]
+VAR T_1_NewAddress = CALCULATE(SELECTEDVALUE(Ethereum_Onchain_Analytics_Stats[New Address]), Ethereum_Onchain_Analytics_Stats[Date] = PriorDate)
+RETURN T_1_NewAddress
+
+T-1 ETH Transaction Count
+VAR PriorDate = Measure_Ethereum_Onchain_Analytics_Stats[T-1 ETH Date]
+VAR T_1_TransactionCount = CALCULATE(SELECTEDVALUE(Ethereum_Onchain_Analytics_Stats[Transactions]), Ethereum_Onchain_Analytics_Stats[Date] = PriorDate)
+RETURN T_1_TransactionCount
+
+T-1 ETH Transfer Volume Sum
+VAR PriorDate = Measure_Ethereum_Onchain_Analytics_Stats[T-1 ETH Date]
+VAR T_1_TransferVolumeSum = CALCULATE(SELECTEDVALUE(Ethereum_Onchain_Analytics_Stats[Transfer Volume]), Ethereum_Onchain_Analytics_Stats[Date] = PriorDate)
+RETURN T_1_TransferVolumeSum
+
+T ETH Date
+MAX(Ethereum_Onchain_Analytics_Stats[Date])
+
+T ETH Active Address
+VAR LatestDate = Measure_Ethereum_Onchain_Analytics_Stats[T ETH Date]
+VAR T_ActiveAddress = CALCULATE(SELECTEDVALUE(Ethereum_Onchain_Analytics_Stats[Active Address]), Ethereum_Onchain_Analytics_Stats[Date] = LatestDate)
+RETURN T_ActiveAddress
+
+T ETH New Address
+VAR LatestDate = Measure_Ethereum_Onchain_Analytics_Stats[T ETH Date]
+VAR TNewAddress = CALCULATE(SELECTEDVALUE(Ethereum_Onchain_Analytics_Stats[New Address]), Ethereum_Onchain_Analytics_Stats[Date] = LatestDate)
+RETURN TNewAddress
+
+T ETH Transaction Count
+VAR LatestDate = Measure_Ethereum_Onchain_Analytics_Stats[T ETH Date]
+VAR TTransactionCount = CALCULATE(SELECTEDVALUE(Ethereum_Onchain_Analytics_Stats[Transactions]), Ethereum_Onchain_Analytics_Stats[Date] = LatestDate)
+RETURN TTransactionCount
+
+T ETH Transfer Volume Sum
+VAR PriorDate = Measure_Ethereum_Onchain_Analytics_Stats[T ETH Date]
+VAR T_1_TransferVolumeSum = CALCULATE(SELECTEDVALUE(Ethereum_Onchain_Analytics_Stats[Transfer Volume]), Ethereum_Onchain_Analytics_Stats[Date] = PriorDate)
+RETURN T_1_TransferVolumeSum
+
+Percent Change ETH Active Address
+DIVIDE(Measure_Ethereum_Onchain_Analytics_Stats[T ETH Active Address] - Measure_Ethereum_Onchain_Analytics_Stats[T-1 ETH Active Address], Measure_Ethereum_Onchain_Analytics_Stats[T-1 ETH Active Address])
+
+Percent Change ETH New Address
+DIVIDE(Measure_Ethereum_Onchain_Analytics_Stats[T ETH New Address] - Measure_Ethereum_Onchain_Analytics_Stats[T-1 ETH New Address], Measure_Ethereum_Onchain_Analytics_Stats[T-1 ETH New Address])
+
+Percent Change ETH Transaction Count
+DIVIDE(Measure_Ethereum_Onchain_Analytics_Stats[T ETH Transaction Count] - Measure_Ethereum_Onchain_Analytics_Stats[T-1 ETH Transaction Count], Measure_Ethereum_Onchain_Analytics_Stats[T-1 ETH Transaction Count])
+
+Percent Change ETH Transfer Volume Sum
+DIVIDE(Measure_Ethereum_Onchain_Analytics_Stats[T ETH Transfer Volume Sum] - Measure_Ethereum_Onchain_Analytics_Stats[T-1 ETH Transfer Volume Sum], Measure_Ethereum_Onchain_Analytics_Stats[T-1 ETH Transfer Volume Sum])
+
+KPI ETH Active Address
+ROUNDUP([Percent Change ETH Active Address],4)*100&"%  "&IF([Percent Change ETH Active Address]>0, "⇧",  "⇩") & " From Prior Day"
+
+KPI ETH New Address
+ROUNDUP([Percent Change ETH New Address],4)*100&"%  "&IF([Percent Change ETH New Address]>0, "⇧",  "⇩") & " From Prior Day"
+
+KPI ETH Transaction Count
+ROUNDUP([Percent Change ETH Transaction Count],4)*100&"%  "&IF([Percent Change ETH Transaction Count]>0, "⇧",  "⇩") & " From Prior Day"
+
+KPI ETH Transfer Volume
+ROUNDUP([Percent Change ETH Transfer Volume Sum],4)*100&"%  "&IF([Percent Change ETH Transfer Volume Sum]>0, "⇧",  "⇩") & " From Prior Day"
+
+T Date ETH Social Stats
+MAX(Ethereum_Social_Stats[Date])
+
+T-1 Date ETH Social Stats
+CALCULATE(MAX(Ethereum_Social_Stats[Date])-1)
+
+T ETH Tweet Counts
+VAR LatestDate = Measure_Ethereum_Social_Stats[T Date ETH Social Stats]
+VAR T_ETH_Tweet_Counts = CALCULATE(SELECTEDVALUE(Ethereum_Social_Stats[ETH Tweets]), Ethereum_Social_Stats[Date] = LatestDate)
+RETURN T_ETH_Tweet_Counts
+
+T-1 ETH Tweet Counts
+VAR PriorDate = Measure_Ethereum_Social_Stats[T-1 Date ETH Social Stats]
+VAR T_ETH_Tweet_Counts = CALCULATE(SELECTEDVALUE(Ethereum_Social_Stats[ETH Tweets]), Ethereum_Social_Stats[Date] = PriorDate)
+RETURN T_ETH_Tweet_Counts
+
+Percent Change ETH Tweet Counts
+DIVIDE(Measure_Ethereum_Social_Stats[T ETH Tweet Counts] - Measure_ETHEREUM_Social_Stats[T-1 ETH Tweet Counts], Measure_ETHEREUM_Social_Stats[T ETH Tweet Counts])
+
+KPI ETH Tweet Counts
+ROUNDUP([Percent Change ETH Tweet Counts],4)*100&"%  "&IF([Percent Change ETH Tweet Counts]>0, "⇧",  "⇩") & " From Prior Day"
+
+BTC Crypto News Polarity Score
+AVERAGE(Bitcoin_Crypto_News[Polarity])
+
+BTC Reddit Comment Polarity Score
+AVERAGE(Bitcoin_Reddit_Comments[Polarity])
+
+BTC Twitter Comment Polarity Score
+AVERAGE(Bitcoin_Twitter_Comments[Polarity])
+
+ETH Crypto News Polarity Score
+AVERAGE(Ethereum_Crypto_News[Polarity])
+
+ETH Reddit Comment Polarity Score
+AVERAGE(Ethereum_Reddit_Comments[Polarity])
+
+ETH Twitter Comment Polarity Score
+AVERAGE(Ethereum_Twitter_Comments[Polarity])
+
+Min Polarity Score
+FIXED(-1)
+
+Max Polarity Score
+FIXED(1)
+
+Very Negative Polarity Score
+FIXED(-.6)
+
+Negative Polarity Score
+FIXED(-.2)
+
+Positive Polarity Score
+FIXED(.2)
+
+Very Positive Polarity Score
+FIXED(.6)
+
+Last Refresh
+"Last Refresh:"
+
+UTC
+"UTC"
+
+ETH From Prior Day
+"From Prior Day"
+
+BTC From Prior Day
+"From Prior Day"

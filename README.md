@@ -87,4 +87,16 @@ Programming (SQL and Python) <br>
 ### 1.5. End to End Process Flowchart
 ![image](https://user-images.githubusercontent.com/99619460/184965051-de786019-b4db-47d3-9a4a-29891e86895a.png)
 
+### 1.6. Data Source
+#### 1.6.1. Structured Data - API
+![image](https://user-images.githubusercontent.com/99619460/184965276-d84cdc43-f01d-44d9-8a25-56c7f536ec0e.png)
+
+#### 1.6.2. Structured Data - Web Scraping
+![image](https://user-images.githubusercontent.com/99619460/184965368-08fd42d5-94dd-4d33-bb38-384111d8f5db.png)
+
+#### 1.6.3. Unstructured Data - API
+![image](https://user-images.githubusercontent.com/99619460/184965456-ed12fd6f-4eb6-486b-895a-006832f2f678.png)
+
+
+
 
